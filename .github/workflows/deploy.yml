@@ -1,0 +1,37 @@
+name: CI/CD Pipeline Farmacia SGA
+
+on:
+  push:
+    branches:
+      - main # O la rama que uses para despliegues
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy to Server
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+          PROJECT_PATH: "/home/arcci/Descargas/proyecto_gps (2)/proyecto_gps"
+        run: |
+          echo "Conectando al servidor ${SSH_USERNAME}@${SSH_HOST}..."
+          ssh -o StrictHostKeyChecking=no ${SSH_USERNAME}@${SSH_HOST} "cd ${PROJECT_PATH} && /bin/bash deploy.sh"
+
+      - name: Check Deployment Logs (Optional)
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+          PROJECT_PATH: "/home/arcci/Descargas/proyecto_gps (2)/proyecto_gps"
+        run: |
+          echo "Mostrando logs de Docker Compose (últimas 20 líneas de pacientes):"
+          ssh -o StrictHostKeyChecking=no ${SSH_USERNAME}@${SSH_HOST} "sudo docker compose logs pacientes --tail 20"
