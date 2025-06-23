@@ -1,0 +1,226 @@
+/* frontend/src/App.css */
+
+/* --- Variables de Color y Fuentes Globales --- */
+:root {
+  --primary-color: #007bff; /* Un azul moderno y accesible */
+  --primary-hover-color: #0056b3;
+  --secondary-color: #dc3545; /* Rojo para acciones destructivas como "logout" */
+  --secondary-hover-color: #c82333;
+  --background-color: #f4f7f6; /* Un gris muy claro para el fondo */
+  --card-background-color: #ffffff;
+  --text-color: #333;
+  --text-light-color: #f8f9fa;
+  --border-color: #dee2e6;
+  --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --border-radius: 8px;
+  font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+}
+
+body {
+  margin: 0;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- Estructura Principal de la App --- */
+.App {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  text-align: center;
+}
+
+.main-content {
+  flex-grow: 1; /* Hace que el contenido principal ocupe el espacio disponible */
+  padding: 2rem;
+}
+
+/* --- Header / Barra de Navegación --- */
+.App-header {
+  /* Hacemos esta prueba para forzar el cambio */
+  background-color: #007bff !important; 
+  
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 0 2rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 70px;
+}
+
+.logo-title {
+  font-size: 1.5rem;
+  color: var(white); /* <-- AQUÍ ESTÁ EL COLOR DEL TEXTO */
+  margin: 0;
+}
+
+.user-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-greeting {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+}
+
+/* --- ¡ESTILOS DE BOTONES MEJORADOS! --- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem; /* Espacio entre el icono y el texto */
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+  text-decoration: none;
+  color: var(--text-light-color);
+}
+
+.btn:hover {
+  transform: translateY(-2px); /* Pequeño efecto al pasar el cursor */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+/* Botón Primario (Iniciar Sesión, Acciones Principales) */
+.btn-primary {
+  background-color: var(--primary-color);
+}
+.btn-primary:hover {
+  background-color: var(--primary-hover-color);
+}
+
+/* Botón Secundario (Cerrar Sesión, Cancelar) */
+.btn-secondary {
+  background-color: var(--secondary-color);
+}
+.btn-secondary:hover {
+  background-color: var(--secondary-hover-color);
+}
+
+.btn-large {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+}
+
+/* --- Contenedores y Tarjetas (Cards) --- */
+.card {
+  background-color: var(--card-background-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  padding: 2rem;
+  border: 1px solid var(--border-color);
+}
+
+/* Vista de "Bienvenida" (No autenticado) */
+.welcome-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.welcome-card {
+  max-width: 500px;
+  text-align: center;
+}
+
+.welcome-card h2 {
+  margin-top: 0;
+  font-size: 2rem;
+  color: var(--primary-color);
+}
+
+.welcome-card p {
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+/* Vista "Dashboard" (Autenticado) */
+.dashboard-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); /* Layout responsive */
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.component-card {
+  width: 70%;
+  text-align: left;
+}
+
+/* --- Pantalla de Carga --- */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 1.5rem;
+  color: var(--primary-color);
+}
+
+.loading-spinner {
+  font-size: 3rem;
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- Footer --- */
+.App-footer {
+  background-color: #343a40;
+  color: var(--text-light-color);
+  padding: 1.5rem;
+  font-size: 0.9rem;
+}
+
+/* --- Responsividad para móviles --- */
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+    height: auto;
+    padding: 1rem 0;
+    gap: 1rem;
+  }
+  
+  .main-content {
+    padding: 1rem;
+  }
+
+  .dashboard-container {
+     grid-template-columns: 1fr; /* Apila las tarjetas en pantallas pequeñas */
+  }
+
+  .user-controls {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

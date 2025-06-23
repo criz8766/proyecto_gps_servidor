@@ -1,0 +1,53 @@
+/* frontend/src/components/FormularioPaciente.css */
+
+.formulario-container h2 {
+  text-align: center;
+  color: var(--primary-color);
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #555;
+}
+
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group input[type="number"]{
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.formulario-container button.btn {
+  width: 100%;
+  padding: 0.9rem;
+}
+
+.mensaje-feedback {
+  margin-top: 1rem;
+  padding: 0.8rem;
+  text-align: center;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  background-color: #e9ecef;
+  border: 1px solid var(--border-color);
+}
+

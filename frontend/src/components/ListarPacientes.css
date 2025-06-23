@@ -1,0 +1,133 @@
+/* frontend/src/components/ListarPacientes.css */
+
+.listar-pacientes-container {
+  width: 100%;
+}
+
+.listar-pacientes-title {
+  text-align: center;
+  color: var(--primary-color);
+  margin-bottom: 1.5rem;
+}
+
+.listar-pacientes-mensaje {
+  text-align: center;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: var(--border-radius);
+  background-color: #e9ecef;
+}
+.listar-pacientes-mensaje.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+.listar-pacientes-mensaje.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+
+/* --- Estilos de la Tabla --- */
+.pacientes-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  box-shadow: var(--shadow);
+  background-color: var(--card-background-color);
+  border-radius: var(--border-radius);
+  overflow: hidden; /* Para que el borde redondeado se aplique a la tabla */
+  white-space: nowrap;
+}
+
+.pacientes-table th,
+.pacientes-table td {
+  padding: 12px 15px;
+  text-align: left;
+}
+
+.pacientes-table thead tr {
+  background-color: var(--primary-color);
+  color: var(--text-light-color);
+  font-size: 1rem;
+}
+
+.pacientes-table tbody tr {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.pacientes-table tbody tr:last-of-type {
+  border-bottom: none;
+}
+
+.pacientes-table tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+.acciones-cell {
+  display: flex;
+  gap: 10px;
+}
+
+/* --- Estilos para Botones de Acción (Editar/Eliminar) --- */
+.btn-accion {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: opacity 0.2s;
+  color: white;
+  font-size: 0.9rem;
+}
+.btn-accion:hover {
+  opacity: 0.8;
+}
+
+.btn-accion.editar {
+  background-color: #ebb44d; /* Un gris neutro */
+}
+
+.btn-accion.eliminar {
+  background-color: var(--secondary-color); /* Rojo, como el logout */
+}
+
+/* --- Estilos para el Modal de Edición --- */
+.modal-edicion {
+  position: fixed; /* Se queda fijo en la pantalla */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* Fondo semi-transparente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-contenido {
+  background-color: var(--card-background-color);
+  padding: 2rem 2.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+}
+
+.cerrar-modal {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #aaa;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.cerrar-modal:hover {
+  color: #333;
+}

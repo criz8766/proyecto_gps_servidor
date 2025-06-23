@@ -1,0 +1,99 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15-alpine # Cambiado de docker.io/library/postgres
+    container_name: postgres
+    environment:
+      POSTGRES_DB: farmacia
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  mongo:
+    image: mongo:6 # Cambiado de docker.io/library/mongo
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+
+  zookeeper:
+    image: bitnami/zookeeper:latest # Mismo de Podman Compose
+    container_name: zookeeper
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: bitnami/kafka:2.8.1 # Mismo de Podman Compose
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      - KAFKA_CFG_BROKER_ID=1
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://0.0.0.0:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092 # Importante para la comunicación interna
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    depends_on:
+      - zookeeper
+
+  pacientes:
+    build:
+      context: ./pacientes
+    container_name: pacientes
+    depends_on:
+      - postgres
+      - kafka
+    env_file:
+      - ./pacientes/.env # Carga variables de entorno desde .env
+    ports:
+      - "8000:8000"
+
+  inventario:
+    build:
+      context: ./inventario
+    container_name: inventario
+    depends_on:
+      - postgres
+      - kafka
+    env_file:
+      - ./inventario/.env # Carga variables de entorno desde .env
+    ports:
+      - "8001:8001"
+
+  frontend:
+    build:
+      context: ./frontend
+      args: # Envía argumentos de construcción para las variables de entorno de React
+        REACT_APP_AUTH0_DOMAIN: ${AUTH0_DOMAIN}
+        REACT_APP_AUTH0_CLIENT_ID: ${AUTH0_CLIENT_ID}
+        REACT_APP_AUTH0_API_AUDIENCE: ${AUTH0_API_AUDIENCE}
+        REACT_APP_PACIENTES_API_URL: /api/pacientes
+        REACT_APP_INVENTARIO_API_URL: /api/inventario
+    container_name: frontend
+    ports:
+      - "3000:80" # El frontend React servirá en el puerto 80 del contenedor
+    depends_on:
+      - pacientes
+      - inventario
+
+  webhook_listener:
+    build:
+      context: ./webhook_listener
+    container_name: webhook_listener
+    env_file:
+      - ./webhook_listener/.env
+    ports:
+      - "8082:8000"
+    depends_on:
+      - frontend
+
+volumes:
+  pgdata:
+  mongodata:

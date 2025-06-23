@@ -1,0 +1,108 @@
+/* frontend/src/App.css */
+.App {
+  text-align: center; /* Mantiene el texto centrado si no hay otros estilos específicos */
+}
+
+.App-header {
+  background-color: #1e88e5; /* Un azul más vibrante para la cabecera */
+  padding: 20px;
+  color: white;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.App-header h1 {
+  margin: 0;
+  font-size: 1.8em;
+}
+
+/* Estilos para el layout de App.tsx si quieres organizar los componentes */
+.App main {
+  padding: 20px;
+}
+
+.separador {
+  border: none;
+  height: 2px;
+  background-color: #90caf9; /* Color del separador */
+  margin: 40px auto; /* Margen arriba/abajo y centrado */
+  width: 80%; /* Ancho del separador */
+}
+
+/* ... (mantén tus estilos existentes de App-logo si los usas en otro lado) ... */
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+.dashboard-container {
+  display: flex;
+  align-items: stretch;    /* Centra las tarjetas horizontalmente */
+  gap: 2rem;              /* Mantiene el espacio entre las tarjetas */
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+/* Añade estas nuevas clases a tu App.css */
+
+.header-left, .header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem; /* Espacio entre elementos */
+}
+
+/* Modifica el saludo para que se vea bien al lado del título */
+.user-greeting {
+  color: var(white);
+  font-weight: 500;
+  border-left: 2px solid var(--border-color);
+  padding-left: 1.5rem;
+}
+
+
+/* --- Estilos para los botones de navegación --- */
+/* Modifica la regla que ya tenías para .main-nav a */
+.main-nav a {
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  color: var(--primary-color);
+  background-color: white;
+  border: 2px solid var(--primary-color);
+  border-radius: var(--border-radius);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+  gap: 1rem;
+}
+
+/* Estilo cuando pasas el mouse por encima */
+.main-nav a:hover {
+  background-color: var(--primary-color);
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Estilo para el botón de la página ACTIVA */
+.main-nav a.active {
+  background-color: var(--primary-color);
+  color: white;
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
