@@ -1,19 +1,21 @@
+# docker-compose.yml (Versión Corregida)
+
 version: '3.8'
 services:
   postgres:
-    image: postgres:15-alpine # Cambiado de docker.io/library/postgres
+    image: postgres:15-alpine
     container_name: postgres
     environment:
-      POSTGRES_DB: farmacia
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: ${POSTGRES_DB} # Usará 'farmacia' desde el .env raíz
+      POSTGRES_USER: ${POSTGRES_USER} # Usará 'admin' desde el .env raíz
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} # Usará 'admin' desde el .env raíz
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
 
   mongo:
-    image: mongo:6 # Cambiado de docker.io/library/mongo
+    image: mongo:6
     container_name: mongo
     ports:
       - "27017:27017"
@@ -21,7 +23,7 @@ services:
       - mongodata:/data/db
 
   zookeeper:
-    image: bitnami/zookeeper:latest # Mismo de Podman Compose
+    image: bitnami/zookeeper:latest
     container_name: zookeeper
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
@@ -29,7 +31,7 @@ services:
       - "2181:2181"
 
   kafka:
-    image: bitnami/kafka:2.8.1 # Mismo de Podman Compose
+    image: bitnami/kafka:2.8.1
     container_name: kafka
     ports:
       - "9092:9092"
@@ -38,7 +40,7 @@ services:
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT
       - KAFKA_CFG_LISTENERS=PLAINTEXT://0.0.0.0:9092
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092 # Importante para la comunicación interna
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
       - ALLOW_PLAINTEXT_LISTENER=yes
     depends_on:
       - zookeeper
@@ -50,8 +52,18 @@ services:
     depends_on:
       - postgres
       - kafka
-    env_file:
-      - ./pacientes/.env # Carga variables de entorno desde .env
+    # --- ESTA ES LA SECCIÓN MODIFICADA ---
+    # En lugar de env_file, usamos 'environment' para que SÍ reemplace las variables
+    # desde el .env de la raíz del proyecto.
+    environment:
+      AUTH0_DOMAIN: ${AUTH0_DOMAIN}
+      AUTH0_API_AUDIENCE: ${AUTH0_API_AUDIENCE}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: postgres
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      ALLOWED_ORIGINS: http://localhost:3000,https://sga.arccidev.com
     ports:
       - "8000:8000"
 
@@ -62,15 +74,24 @@ services:
     depends_on:
       - postgres
       - kafka
-    env_file:
-      - ./inventario/.env # Carga variables de entorno desde .env
+    # --- ESTA ES LA SECCIÓN MODIFICADA ---
+    # Hacemos lo mismo para el servicio de inventario.
+    environment:
+      AUTH0_DOMAIN: ${AUTH0_DOMAIN}
+      AUTH0_API_AUDIENCE: ${AUTH0_API_AUDIENCE}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: postgres
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      ALLOWED_ORIGINS: http://localhost:3000,https://sga.arccidev.com
     ports:
       - "8001:8001"
 
   frontend:
     build:
       context: ./frontend
-      args: # Envía argumentos de construcción para las variables de entorno de React
+      args:
         REACT_APP_AUTH0_DOMAIN: ${AUTH0_DOMAIN}
         REACT_APP_AUTH0_CLIENT_ID: ${AUTH0_CLIENT_ID}
         REACT_APP_AUTH0_API_AUDIENCE: ${AUTH0_API_AUDIENCE}
@@ -78,22 +99,24 @@ services:
         REACT_APP_INVENTARIO_API_URL: /api/inventario
     container_name: frontend
     ports:
-      - "3000:80" # El frontend React servirá en el puerto 80 del contenedor
+      - "3000:80"
     depends_on:
       - pacientes
       - inventario
 
-  webhook_listener:
-    build:
-      context: ./webhook_listener
-    container_name: webhook_listener
-    env_file:
-      - ./webhook_listener/.env
+  jenkins:
+    image: jenkins/jenkins:lts-jdk17
+    container_name: jenkins
     ports:
-      - "8082:8000"
-    depends_on:
-      - frontend
+      - "8081:8080" # Puerto para acceder a la interfaz web de Jenkins
+      - "50000:50000" # Puerto para los agentes de Jenkins
+    volumes:
+      - jenkins_data:/var/jenkins_home # Volumen para persistir los datos de Jenkins
+      - /var/run/docker.sock:/var/run/docker.sock # Permite a Jenkins usar el Docker de tu máquina
+    user: root # Ejecutar como root para evitar problemas de permisos con Docker
+
 
 volumes:
   pgdata:
   mongodata:
+  jenkins_data:

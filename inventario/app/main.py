@@ -25,7 +25,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(productos.router, prefix="/api/productos", tags=["Productos"])
+app.include_router(productos.router, prefix="/api/inventario", tags=["Productos"])
 app.include_router(compras.router, prefix="/api/compras", tags=["Compras"])
 
 @app.get("/", tags=["Root"])
