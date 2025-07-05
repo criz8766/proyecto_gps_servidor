@@ -44,8 +44,8 @@ pipeline {
                 echo 'Desplegando la nueva versión en el servidor...'
                 sshagent([SSH_CREDENTIALS_ID]) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no arcci@tu-servidor '
-                            cd /ruta/a/tu/proyecto
+                        ssh -o StrictHostKeyChecking=no arcci@192.168.0.29 '
+                            cd /home/arcci/Descargas/proyecto_gps (2)/proyecto_gps
                             echo "Iniciando sesión en GHCR en el servidor..."
                             cat ~/.github-pat | docker login ghcr.io -u ${REGISTRY_OWNER} --password-stdin
                             echo "Descargando las nuevas imágenes..."
