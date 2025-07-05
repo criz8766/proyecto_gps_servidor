@@ -105,7 +105,9 @@ services:
       - inventario
 
   jenkins:
-    image: jenkins/jenkins:lts-jdk17
+    # --- ESTE ES EL CAMBIO PRINCIPAL ---
+    # En lugar de descargar una imagen, la construimos desde nuestra carpeta local
+    build: ./jenkins-docker
     container_name: jenkins
     ports:
       - "8081:8080"
@@ -113,11 +115,8 @@ services:
     volumes:
       - jenkins_data:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
-    # --- ESTA ES LA LÍNEA NUEVA Y CORRECCIÓN ---
-    # Ya no necesitamos 'user: root'. Lo eliminamos.
-    # En su lugar, añadimos el contenedor al grupo de Docker del host.
     group_add:
-      - 125  # <--- REEMPLAZA 999 CON EL NÚMERO QUE OBTUVISTE EN EL PASO 1
+      - 125  # Asegúrate de que este es el GID de docker en tu máquina (grep docker /etc/group)
 
 
 volumes:
