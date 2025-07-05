@@ -1,18 +1,27 @@
-// Jenkinsfile
+// Jenkinsfile (Versión Final Corregida)
 
 pipeline {
-    agent any // Jenkins puede usar cualquier agente disponible para ejecutar este pipeline
+    // --- ESTE ES EL CAMBIO ---
+    // Le decimos al agente que necesita la herramienta 'docker'
+    // y que debe usar la configuración que llamamos 'docker-host'.
+    agent {
+        any {
+            tools {
+                // El nombre 'docker-host' debe coincidir EXACTAMENTE
+                // con el nombre que le diste en la configuración de herramientas.
+                docker 'docker-host'
+            }
+        }
+    }
 
     environment {
         // Define el nombre de tu usuario de GitHub. Reemplázalo por el tuyo.
-        // Lo usaremos para el registro de contenedores de GitHub (GHCR).
-        REGISTRY_OWNER = "Criz8766"
+        REGISTRY_OWNER = "criz8766" // Reemplaza con tu usuario de GitHub
         
-        // El nombre de tu repositorio. Reemplázalo por el tuyo.
+        // El nombre de tu repositorio.
         REPO_NAME = "proyecto_gps_servidor"
 
-        // El ID de las credenciales SSH que crearemos en Jenkins más adelante.
-        // Puedes dejar este nombre o elegir otro.
+        // El ID de las credenciales SSH que creamos en Jenkins.
         SSH_CREDENTIALS_ID = "servidor-produccion-ssh"
     }
 
@@ -21,7 +30,6 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'Obteniendo el código desde el repositorio...'
-                // Este comando clona tu repositorio en la rama 'main'
                 git branch: 'main', url: "https://github.com/${REGISTRY_OWNER}/${REPO_NAME}.git"
             }
         }
@@ -30,37 +38,24 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 echo 'Construyendo las imágenes de los servicios...'
-                // Construye la imagen para el servicio de pacientes
-                script {
-                    docker.build("${REGISTRY_OWNER}/${REPO_NAME}/pacientes:latest", "./pacientes")
-                }
-                // Construye la imagen para el servicio de inventario
-                script {
-                    docker.build("${REGISTRY_OWNER}/${REPO_NAME}/inventario:latest", "./inventario")
-                }
-                // Construye la imagen para el frontend
-                script {
-                    docker.build("${REGISTRY_OWNER}/${REPO_NAME}/frontend:latest", "./frontend")
-                }
+                // Ahora Jenkins usará la herramienta Docker configurada
+                sh "docker build -t ghcr.io/${REGISTRY_OWNER}/${REPO_NAME}/pacientes:latest ./pacientes"
+                sh "docker build -t ghcr.io/${REGISTRY_OWNER}/${REPO_NAME}/inventario:latest ./inventario"
+                sh "docker build -t ghcr.io/${REGISTRY_OWNER}/${REPO_NAME}/frontend:latest ./frontend"
             }
         }
         
-        // Etapa 3: Subir las imágenes a un Registro de Contenedores
+        // Etapa 3: Subir las imágenes a GitHub Container Registry (GHCR)
         stage('Push to Registry') {
             steps {
-                echo 'Iniciando sesión y subiendo imágenes a GitHub Container Registry (GHCR)...'
-                // Usa las credenciales que guardaremos en Jenkins para iniciar sesión en GHCR.
-                // El ID 'github-pat' lo crearemos en los siguientes pasos.
+                echo 'Iniciando sesión y subiendo imágenes a GHCR...'
                 withCredentials([string(credentialsId: 'github-pat', variable: 'GITHUB_PAT')]) {
                     sh "echo ${GITHUB_PAT} | docker login ghcr.io -u ${REGISTRY_OWNER} --password-stdin"
                 }
 
-                // Sube cada una de las imágenes construidas al registro
-                script {
-                    docker.image("${REGISTRY_OWNER}/${REPO_NAME}/pacientes:latest").push()
-                    docker.image("${REGISTRY_OWNER}/${REPO_NAME}/inventario:latest").push()
-                    docker.image("${REGISTRY_OWNER}/${REPO_NAME}/frontend:latest").push()
-                }
+                sh "docker push ghcr.io/${REGISTRY_OWNER}/${REPO_NAME}/pacientes:latest"
+                sh "docker push ghcr.io/${REGISTRY_OWNER}/${REPO_NAME}/inventario:latest"
+                sh "docker push ghcr.io/${REGISTRY_OWNER}/${REPO_NAME}/frontend:latest"
             }
         }
 
@@ -68,12 +63,13 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Desplegando la nueva versión en el servidor...'
-                // Usa las credenciales SSH para conectarse al servidor y ejecutar los comandos de despliegue.
                 sshagent([SSH_CREDENTIALS_ID]) {
-                    // Reemplaza 'usuario@tu-servidor' y '/ruta/a/tu/proyecto' con tus datos reales.
+                    // Reemplaza 'arcci@tu-servidor' y '/ruta/a/tu/proyecto' con tus datos reales.
                     sh """
-                        ssh -o StrictHostKeyChecking=no usuario@tu-servidor '
+                        ssh -o StrictHostKeyChecking=no arcci@tu-servidor '
                             cd /ruta/a/tu/proyecto
+                            echo "Iniciando sesión en GHCR en el servidor..."
+                            cat ~/.github-pat | docker login ghcr.io -u ${REGISTRY_OWNER} --password-stdin
                             echo "Descargando las nuevas imágenes..."
                             docker-compose pull
                             echo "Reiniciando los servicios..."
@@ -87,11 +83,10 @@ pipeline {
         }
     }
     
-    // Acciones que se ejecutan siempre al final del pipeline
     post {
         always {
             echo 'Limpiando el espacio de trabajo...'
-            cleanWs() // Borra los archivos del workspace para mantener limpio Jenkins
+            cleanWs()
         }
     }
 }
