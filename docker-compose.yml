@@ -108,12 +108,16 @@ services:
     image: jenkins/jenkins:lts-jdk17
     container_name: jenkins
     ports:
-      - "8081:8080" # Puerto para acceder a la interfaz web de Jenkins
-      - "50000:50000" # Puerto para los agentes de Jenkins
+      - "8081:8080"
+      - "50000:50000"
     volumes:
-      - jenkins_data:/var/jenkins_home # Volumen para persistir los datos de Jenkins
-      - /var/run/docker.sock:/var/run/docker.sock # Permite a Jenkins usar el Docker de tu máquina
-    user: root # Ejecutar como root para evitar problemas de permisos con Docker
+      - jenkins_data:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    # --- ESTA ES LA LÍNEA NUEVA Y CORRECCIÓN ---
+    # Ya no necesitamos 'user: root'. Lo eliminamos.
+    # En su lugar, añadimos el contenedor al grupo de Docker del host.
+    group_add:
+      - 125  # <--- REEMPLAZA 999 CON EL NÚMERO QUE OBTUVISTE EN EL PASO 1
 
 
 volumes:
