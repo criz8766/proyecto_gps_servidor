@@ -1,10 +1,5 @@
 # .woodpecker.yml - Nuestro pipeline de CI/CD
 
-# ¿Cuándo se ejecuta este pipeline?
-when:
-  branch: main  # Cuando haya un push a la rama 'main'
-  event: push
-
 # 'pipeline' es la secuencia de pasos a ejecutar
 pipeline:
   # Paso 1: Construir y subir las 3 imágenes a GHCR
