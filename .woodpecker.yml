@@ -1,77 +1,58 @@
-# .woodpecker.yml - CI/CD para GPS
+# .woodpecker.yml (Versión Final y Simplificada)
 
-# Ejecutar solo en la rama main al hacer push
 when:
   branch: main
   event: push
 
 steps:
-  # Construcción de la imagen de pacientes
-  build_pacientes:
+  build_and_push_pacientes:
     image: woodpeckerci/plugin-docker-buildx
     settings:
       registry: ghcr.io
       repo: ghcr.io/criz8766/proyecto_gps_servidor/pacientes
       username: criz8766
-      password:
-        from_secret: GITHUB_PAT
-      # --- CORRECCIÓN AQUÍ ---
-      context: pacientes # Le decimos que trabaje dentro de la carpeta 'pacientes'
-      dockerfile: pacientes/Dockerfile.pacientes
+      password: { from_secret: GITHUB_PAT }
+      context: pacientes  # <-- Le decimos que trabaje aquí
       tags:
         - latest
         - ${COMMIT_SHA}
 
-  # Construcción de la imagen de inventario
-  build_inventario:
+  build_and_push_inventario:
     image: woodpeckerci/plugin-docker-buildx
     settings:
       registry: ghcr.io
       repo: ghcr.io/criz8766/proyecto_gps_servidor/inventario
       username: criz8766
-      password:
-        from_secret: GITHUB_PAT
-      # --- CORRECCIÓN AQUÍ ---
-      context: inventario # Le decimos que trabaje dentro de la carpeta 'inventario'
-      dockerfile: inventario/Dockerfile.inventario
+      password: { from_secret: GITHUB_PAT }
+      context: inventario # <-- Le decimos que trabaje aquí
       tags:
         - latest
         - ${COMMIT_SHA}
 
-  # Construcción de la imagen del frontend
-  build_frontend:
+  build_and_push_frontend:
     image: woodpeckerci/plugin-docker-buildx
     settings:
       registry: ghcr.io
       repo: ghcr.io/criz8766/proyecto_gps_servidor/frontend
       username: criz8766
-      password:
-        from_secret: GITHUB_PAT
-      # --- CORRECCIÓN AQUÍ ---
-      context: frontend # Le decimos que trabaje dentro de la carpeta 'frontend'
-      dockerfile: frontend/Dockerfile.frontend
+      password: { from_secret: GITHUB_PAT }
+      context: frontend # <-- Le decimos que trabaje aquí
       tags:
         - latest
         - ${COMMIT_SHA}
 
-  # Despliegue remoto por SSH al servidor
-  deploy:
+  # El paso de despliegue se ejecuta solo si los anteriores tienen éxito
+  deploy_to_server:
     image: appleboy/drone-ssh
     settings:
       host: 192.168.0.29
       username: arcci
-      key:
-        from_secret: SERVIDOR_PRODUCCION_SSH
+      key: { from_secret: SERVIDOR_PRODUCCION_SSH }
       script:
         - cd /home/arcci/Descargas/proyecto_gps_servidor/proyecto_gps
         - git pull origin main
-        - echo "Iniciando sesión en GHCR en el servidor..."
         - cat ~/.github-pat | docker login ghcr.io -u criz8766 --password-stdin
-        - echo "Descargando las nuevas imágenes..."
         - docker-compose -f docker-compose.prod.yml pull
-        - echo "Deteniendo servicios antiguos..."
         - docker-compose -f docker-compose.prod.yml down --remove-orphans
-        - echo "Iniciando nuevos servicios..."
         - docker-compose -f docker-compose.prod.yml up -d
-        - echo "Limpiando imágenes antiguas..."
         - docker image prune -af
