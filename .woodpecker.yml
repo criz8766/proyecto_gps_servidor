@@ -1,4 +1,4 @@
-# .woodpecker.yml (Versión Final con Despliegue Seguro)
+# .woodpecker.yml (Versión con Carga de Entorno Explícita)
 
 when:
   branch: main
@@ -46,7 +46,7 @@ steps:
         - latest
         - ${COMMIT_SHA}
 
-  # --- ESTE ES EL PASO QUE VAMOS A CORREGIR ---
+  # --- DESPLIEGUE CON CORRECCIÓN FINAL ---
   deploy:
     image: appleboy/drone-ssh
     settings:
@@ -59,9 +59,13 @@ steps:
         - echo "==> Iniciando sesión en GHCR..."
         - cat ~/.github-pat | docker login ghcr.io -u criz8766 --password-stdin
         - echo "==> Descargando las nuevas imágenes..."
-        - docker-compose -f docker-compose.prod.yml pull
-        - echo "==> Reiniciando servicios con las nuevas imágenes..."
-        # Este es el comando seguro: reinicia solo lo necesario sin destruir todo.
-        - docker-compose -f docker-compose.prod.yml up -d --remove-orphans
+        # Le decimos que use el .env
+        - docker-compose --env-file .env -f docker-compose.prod.yml pull
+        - echo "==> Deteniendo servicios antiguos..."
+        # Le decimos que use el .env
+        - docker-compose --env-file .env -f docker-compose.prod.yml down --remove-orphans
+        - echo "==> Iniciando nuevos servicios..."
+        # Le decimos que use el .env
+        - docker-compose --env-file .env -f docker-compose.prod.yml up -d
         - echo "==> Limpiando imágenes antiguas..."
         - docker image prune -af
