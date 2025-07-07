@@ -11,6 +11,7 @@ steps:
     image: woodpeckerci/plugin-docker-buildx
     settings:
       repo: ghcr.io/criz8766/proyecto_gps_servidor
+      registry: ghcr.io
       username: criz8766
       password:
         from_secret: GITHUB_PAT
