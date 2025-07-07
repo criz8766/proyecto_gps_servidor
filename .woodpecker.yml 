@@ -1,0 +1,52 @@
+# .woodpecker.yml - Nuestro pipeline de CI/CD
+
+# ¿Cuándo se ejecuta este pipeline?
+when:
+  branch: main  # Cuando haya un push a la rama 'main'
+  event: push
+
+# 'pipeline' es la secuencia de pasos a ejecutar
+pipeline:
+  # Paso 1: Construir y subir las 3 imágenes a GHCR
+  # Usamos un "plugin" (que es una imagen de Docker) para simplificar la tarea
+  publish:
+    image: woodpeckerci/plugin-docker-buildx
+    settings:
+      # El registro al que subiremos las imágenes
+      repo: ghcr.io/criz8766/proyecto_gps_servidor
+      # Usamos el token de GitHub que guardaremos como secreto
+      username: criz8766
+      password:
+        from_secret: GITHUB_PAT
+      # Lista de Dockerfiles que queremos construir y subir
+      dockerfile_list:
+        - Dockerfile.pacientes
+        - Dockerfile.inventario
+        - Dockerfile.frontend
+      # Etiquetas que le pondremos a cada imagen
+      # {COMMIT_SHA} es una variable mágica de Woodpecker
+      tags:
+        - ${COMMIT_SHA}
+        - latest
+
+  # Paso 2: Desplegar en el servidor
+  deploy:
+    image: appleboy/drone-ssh # Plugin para ejecutar comandos por SSH
+    settings:
+      host: 192.168.0.29
+      username: arcci
+      key:
+        from_secret: SERVIDOR_PRODUCCION_SSH # Usamos la clave SSH guardada como secreto
+      script:
+        - cd /home/arcci/Descargas/proyecto_gps_servidor/proyecto_gps
+        - git pull origin main
+        - echo "Iniciando sesión en GHCR en el servidor..."
+        - cat ~/.github-pat | docker login ghcr.io -u criz8766 --password-stdin
+        - echo "Descargando las nuevas imágenes..."
+        - docker-compose -f docker-compose.prod.yml pull
+        - echo "Deteniendo servicios antiguos..."
+        - docker-compose -f docker-compose.prod.yml down --remove-orphans
+        - echo "Iniciando nuevos servicios..."
+        - docker-compose -f docker-compose.prod.yml up -d
+        - echo "Limpiando imágenes antiguas..."
+        - docker image prune -af

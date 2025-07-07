@@ -104,22 +104,7 @@ services:
       - pacientes
       - inventario
 
-  jenkins:
-    # --- ESTE ES EL CAMBIO PRINCIPAL ---
-    # En lugar de descargar una imagen, la construimos desde nuestra carpeta local
-    build: ./jenkins-docker
-    container_name: jenkins
-    ports:
-      - "8081:8080"
-      - "50000:50000"
-    volumes:
-      - jenkins_data:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
-    group_add:
-      - 125  # Asegúrate de que este es el GID de docker en tu máquina (grep docker /etc/group)
-
 
 volumes:
   pgdata:
   mongodata:
-  jenkins_data:

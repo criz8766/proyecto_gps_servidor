@@ -1,8 +1,9 @@
-# docker-compose.prod.yml
+# docker-compose.prod.yml (Versión Final Corregida)
 
 version: '3.8'
 
 services:
+  # Jenkins YA NO ESTÁ AQUÍ. Solo están los servicios de la aplicación.
   postgres:
     image: postgres:15-alpine
     container_name: postgres
@@ -47,7 +48,6 @@ services:
       - zookeeper
 
   pacientes:
-    # Usamos la imagen del registro, no construimos
     image: ghcr.io/criz8766/proyecto_gps_servidor/pacientes:latest
     container_name: pacientes
     depends_on:
@@ -66,7 +66,6 @@ services:
       - "8000:8000"
 
   inventario:
-    # Usamos la imagen del registro, no construimos
     image: ghcr.io/criz8766/proyecto_gps_servidor/inventario:latest
     container_name: inventario
     depends_on:
@@ -85,7 +84,6 @@ services:
       - "8001:8001"
 
   frontend:
-    # Usamos la imagen del registro, no construimos
     image: ghcr.io/criz8766/proyecto_gps_servidor/frontend:latest
     container_name: frontend
     ports:

@@ -1,0 +1,25 @@
+# Ignorar archivos de entorno
+.env
+.env.*
+# Ignorar archivos de configuración de Cloudflared
+cloudflared/config.yml
+# Ignorar archivos de configuración de Jenkins
+jenkins/config.xml
+jenkins/jenkins_home/
+# Ignorar archivos de configuración de Woodpecker
+woodpecker/config.yml  
+woodpecker/woodpecker_home/
+# Ignorar archivos de configuración de Docker Compose
+docker-compose.override.yml
+docker-compose.prod.yml
+# Ignorar archivos de configuración de PostgreSQL
+postgresql/postgresql.conf
+postgresql/pg_hba.conf
+# Ignorar archivos de configuración de MongoDB
+mongodb/mongod.conf
+# Ignorar archivos de configuración de Kafka
+kafka/server.properties
+# Ignorar archivos de configuración de Redis
+redis/redis.conf
+# Ignorar archivos de configuración de Nginx
+nginx/nginx.conf
