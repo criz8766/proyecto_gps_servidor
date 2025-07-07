@@ -15,7 +15,8 @@ steps:
       username: criz8766
       password:
         from_secret: GITHUB_PAT
-      dockerfile: Dockerfile.pacientes
+      # --- CORRECCIÓN AQUÍ ---
+      dockerfile: pacientes/Dockerfile.pacientes
       tags:
         - latest
         - ${COMMIT_SHA}
@@ -29,7 +30,8 @@ steps:
       username: criz8766
       password:
         from_secret: GITHUB_PAT
-      dockerfile: Dockerfile.inventario
+      # --- CORRECCIÓN AQUÍ ---
+      dockerfile: inventario/Dockerfile.inventario
       tags:
         - latest
         - ${COMMIT_SHA}
@@ -43,7 +45,8 @@ steps:
       username: criz8766
       password:
         from_secret: GITHUB_PAT
-      dockerfile: Dockerfile.frontend
+      # --- CORRECCIÓN AQUÍ ---
+      dockerfile: frontend/Dockerfile.frontend
       tags:
         - latest
         - ${COMMIT_SHA}
