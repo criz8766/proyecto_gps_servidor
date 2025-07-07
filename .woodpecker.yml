@@ -16,6 +16,7 @@ steps:
       password:
         from_secret: GITHUB_PAT
       # --- CORRECCIÓN AQUÍ ---
+      context: pacientes # Le decimos que trabaje dentro de la carpeta 'pacientes'
       dockerfile: pacientes/Dockerfile.pacientes
       tags:
         - latest
@@ -31,6 +32,7 @@ steps:
       password:
         from_secret: GITHUB_PAT
       # --- CORRECCIÓN AQUÍ ---
+      context: inventario # Le decimos que trabaje dentro de la carpeta 'inventario'
       dockerfile: inventario/Dockerfile.inventario
       tags:
         - latest
@@ -46,6 +48,7 @@ steps:
       password:
         from_secret: GITHUB_PAT
       # --- CORRECCIÓN AQUÍ ---
+      context: frontend # Le decimos que trabaje dentro de la carpeta 'frontend'
       dockerfile: frontend/Dockerfile.frontend
       tags:
         - latest
