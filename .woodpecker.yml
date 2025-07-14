@@ -22,8 +22,6 @@ steps:
       echo "Auth0 Domain: $REACT_APP_AUTH0_DOMAIN"
       echo "Client ID: $REACT_APP_AUTH0_CLIENT_ID"
       echo "Audience: $REACT_APP_AUTH0_API_AUDIENCE"
-      echo "Pacientes API URL: $REACT_APP_PACIENTES_API_URL"
-      echo "Inventario API URL: $REACT_APP_INVENTARIO_API_URL"
 
 - name: build-pacientes
   image: woodpeckerci/plugin-docker-buildx
@@ -70,5 +68,3 @@ steps:
       - REACT_APP_AUTH0_DOMAIN
       - REACT_APP_AUTH0_CLIENT_ID
       - REACT_APP_AUTH0_API_AUDIENCE
-      - REACT_APP_PACIENTES_API_URL
-      - REACT_APP_INVENTARIO_API_URL
