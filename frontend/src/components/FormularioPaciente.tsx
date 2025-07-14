@@ -52,7 +52,7 @@ const FormularioPaciente: React.FC<FormularioPacienteProps> = ({
             value={formData.rut}
             onChange={handleChange}
             required
-            placeholder="Ej: 12345678-9"
+            placeholder="Ej: 12.345.678-9"
           />
         </div>
 
