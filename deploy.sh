@@ -23,13 +23,13 @@ echo $GHCR_PAT | docker login ghcr.io -u criz8766 --password-stdin
 
 # 4. Descarga las imágenes más recientes definidas en docker-compose.yml
 echo "Descargando las nuevas imágenes de Docker..."
-docker-compose pull
+docker compose pull
 
 # 5. Reinicia los servicios usando el archivo docker-compose.yml
 # 'up -d' actualiza los contenedores en segundo plano.
 # '--remove-orphans' limpia contenedores de servicios que ya no existen.
 echo "Reiniciando los servicios con las nuevas imágenes..."
-docker-compose up -d --force-recreate --remove-orphans
+docker compose up -d --force-recreate --remove-orphans
 
 # 6. Opcional: Limpia imágenes de Docker que ya no están en uso
 echo "Limpiando imágenes antiguas sin usar..."
