@@ -1,11 +1,11 @@
-# .woodpecker.yml (Versión CI Corregida y Funcional)
+# .woodpecker.yml (Versión Final, Corregida y Funcional)
 
 when:
   branch: main
   event: push
 
 steps:
-  build_pacientes:
+  - name: build-pacientes
     image: woodpeckerci/plugin-docker-buildx
     settings:
       registry: ghcr.io
@@ -14,11 +14,9 @@ steps:
       password: { from_secret: GITHUB_PAT }
       context: pacientes
       dockerfile: pacientes/Dockerfile
-      tags:
-        - latest
-        - ${COMMIT_SHA}
+      tags: [ latest, ${COMMIT_SHA} ]
 
-  build_inventario:
+  - name: build-inventario
     image: woodpeckerci/plugin-docker-buildx
     settings:
       registry: ghcr.io
@@ -27,21 +25,27 @@ steps:
       password: { from_secret: GITHUB_PAT }
       context: inventario
       dockerfile: inventario/Dockerfile
-      tags:
-        - latest
-        - ${COMMIT_SHA}
+      tags: [ latest, ${COMMIT_SHA} ]
 
-  build_frontend:
+  # --- ESTE ES EL PASO CORREGIDO ---
+  - name: build-frontend
     image: woodpeckerci/plugin-docker-buildx
+    # 1. Cargamos los secretos en el entorno de este paso
+    environment:
+      GITHUB_PAT: { from_secret: GITHUB_PAT }
+      REACT_APP_AUTH0_DOMAIN: { from_secret: REACT_APP_AUTH0_DOMAIN }
+      REACT_APP_AUTH0_CLIENT_ID: { from_secret: REACT_APP_AUTH0_CLIENT_ID }
+      REACT_APP_AUTH0_API_AUDIENCE: { from_secret: REACT_APP_AUTH0_API_AUDIENCE }
     settings:
       registry: ghcr.io
       repo: ghcr.io/criz8766/proyecto_gps_servidor/frontend
       username: criz8766
-      password: { from_secret: GITHUB_PAT }
+      password: ${GITHUB_PAT} # Usamos la variable cargada
       context: frontend
       dockerfile: frontend/Dockerfile
-      tags: [ latest ]
-      build_args_from_env:
+      tags: [ latest, ${COMMIT_SHA} ]
+      # 2. Le decimos a Docker que use las variables del entorno del paso
+      build_args:
         - REACT_APP_AUTH0_DOMAIN
         - REACT_APP_AUTH0_CLIENT_ID
         - REACT_APP_AUTH0_API_AUDIENCE
