@@ -23,3 +23,7 @@ kafka/server.properties
 redis/redis.conf
 # Ignorar archivos de configuración de Nginx
 nginx/nginx.conf
+# ingorar sh de despliegue
+deploy.sh
+# Ignorar el script de inicio de todos los servicios
+start_all.sh
