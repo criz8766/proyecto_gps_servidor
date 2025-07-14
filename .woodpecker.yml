@@ -1,4 +1,4 @@
-# .woodpecker.yml (Versión CI Final con Sintaxis Corregida)
+# .woodpecker.yml (Versión Final con Sintaxis Corregida y Funcional)
 
 when:
   branch: main
@@ -11,11 +11,11 @@ steps:
     registry: ghcr.io
     repo: ghcr.io/criz8766/proyecto_gps_servidor/pacientes
     username: criz8766
-    # --- SINTAXIS CORREGIDA ---
     password:
       from_secret: GITHUB_PAT
     context: pacientes
     dockerfile: pacientes/Dockerfile
+    # --- SINTAXIS CORREGIDA ---
     tags:
       - latest
       - ${COMMIT_SHA}
@@ -26,11 +26,11 @@ steps:
     registry: ghcr.io
     repo: ghcr.io/criz8766/proyecto_gps_servidor/inventario
     username: criz8766
-    # --- SINTAXIS CORREGIDA ---
     password:
       from_secret: GITHUB_PAT
     context: inventario
     dockerfile: inventario/Dockerfile
+    # --- SINTAXIS CORREGIDA ---
     tags:
       - latest
       - ${COMMIT_SHA}
@@ -41,13 +41,14 @@ steps:
     registry: ghcr.io
     repo: ghcr.io/criz8766/proyecto_gps_servidor/frontend
     username: criz8766
-    # --- SINTAXIS CORREGIDA ---
     password:
       from_secret: GITHUB_PAT
     context: frontend
     dockerfile: frontend/Dockerfile
-    tags: [ latest, ${COMMIT_SHA} ]
-    # --- LA SECCIÓN CLAVE CON LA SINTAXIS CORRECTA ---
+    # --- SINTAXIS CORREGIDA ---
+    tags:
+      - latest
+      - ${COMMIT_SHA}
     build_args_from_env:
       - REACT_APP_AUTH0_DOMAIN
       - REACT_APP_AUTH0_CLIENT_ID
