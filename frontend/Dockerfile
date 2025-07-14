@@ -11,8 +11,6 @@ RUN npm install
 
 # Copiar el resto del código fuente
 COPY . .
-# Copiar el archivo .env si existe (para builds en CI/CD)
-COPY .env .env
 
 # Argumentos de construcción para variables de entorno
 ARG REACT_APP_AUTH0_DOMAIN
