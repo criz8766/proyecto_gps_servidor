@@ -1,48 +1,50 @@
-# Etapa 1: Construir la aplicación React
+# Etapa 1: Construcción de la app React
 FROM node:18-alpine AS build
 
+# Directorio de trabajo
 WORKDIR /app
 
-# Copia los archivos de configuración de dependencias primero
+# Copiar y preparar dependencias
 COPY package.json ./
 COPY package-lock.json ./
-
-# Instala las dependencias
 RUN npm install
 
-# Copia el resto del código de la aplicación
+# Copiar el resto del código fuente
 COPY . .
 
-# Argumentos de construcción (ARG) para las variables de entorno de React
-# Estos serán pasados desde el docker-compose.yml
+# Argumentos de construcción para variables de entorno
 ARG REACT_APP_AUTH0_DOMAIN
 ARG REACT_APP_AUTH0_CLIENT_ID
 ARG REACT_APP_AUTH0_API_AUDIENCE
 ARG REACT_APP_PACIENTES_API_URL
 ARG REACT_APP_INVENTARIO_API_URL
 
-# Establece las variables de entorno para el proceso de construcción de React
+# Variables de entorno para build (opcional pero ayuda si necesitas debug)
 ENV REACT_APP_AUTH0_DOMAIN=$REACT_APP_AUTH0_DOMAIN
 ENV REACT_APP_AUTH0_CLIENT_ID=$REACT_APP_AUTH0_CLIENT_ID
 ENV REACT_APP_AUTH0_API_AUDIENCE=$REACT_APP_AUTH0_API_AUDIENCE
 ENV REACT_APP_PACIENTES_API_URL=$REACT_APP_PACIENTES_API_URL
 ENV REACT_APP_INVENTARIO_API_URL=$REACT_APP_INVENTARIO_API_URL
 
-# ¡¡¡NUEVA Y ESPEREMOS DEFINITIVA CORRECCIÓN!!!
-# Ejecuta directamente el script de construcción de react-scripts con node
-RUN node node_modules/react-scripts/scripts/build.js
+# ⚠️ Este paso es CRUCIAL para que React vea las variables
+RUN REACT_APP_AUTH0_DOMAIN=$REACT_APP_AUTH0_DOMAIN \
+    REACT_APP_AUTH0_CLIENT_ID=$REACT_APP_AUTH0_CLIENT_ID \
+    REACT_APP_AUTH0_API_AUDIENCE=$REACT_APP_AUTH0_API_AUDIENCE \
+    REACT_APP_PACIENTES_API_URL=$REACT_APP_PACIENTES_API_URL \
+    REACT_APP_INVENTARIO_API_URL=$REACT_APP_INVENTARIO_API_URL \
+    npm run build
 
-# Etapa 2: Servir la aplicación con Nginx
+# Etapa 2: Servidor web Nginx para producción
 FROM nginx:1.21-alpine
 
-# Copia los archivos estáticos de la aplicación construida al servidor web de Nginx
+# Copiar los archivos estáticos generados por React
 COPY --from=build /app/build /usr/share/nginx/html
 
-# ¡¡¡NUEVA LÍNEA CLAVE!!! Copia la configuración personalizada de Nginx
+# Reemplazar la configuración por defecto de Nginx con la personalizada
 COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 
-# Expone el puerto 80 del contenedor (puerto HTTP estándar)
+# Exponer puerto estándar
 EXPOSE 80
 
-# Comando para iniciar Nginx
+# Iniciar nginx
 CMD ["nginx", "-g", "daemon off;"]
