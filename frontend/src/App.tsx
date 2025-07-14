@@ -37,7 +37,7 @@ function App() {
             
             {/* --- GRUPO IZQUIERDO: Título y Saludo --- */}
             <div className="header-left">
-              <h1 className="logo-title">Gestión Farmacia</h1>
+              <h1 className="logo-title">Gestión Farmacia :3</h1>
               {isAuthenticated && user && (
                 <span className="user-greeting">
                   {FiUser({})} Hola, {user.name || user.email}
