@@ -1,59 +1,49 @@
-# .woodpecker.yml (Versión Final con Sintaxis Corregida)
+# .woodpecker.yml (Versión CI Corregida y Funcional)
 
 when:
   branch: main
   event: push
 
 steps:
-  - name: build-and-push-pacientes
+  build_pacientes:
     image: woodpeckerci/plugin-docker-buildx
     settings:
       registry: ghcr.io
       repo: ghcr.io/criz8766/proyecto_gps_servidor/pacientes
       username: criz8766
-      password:
-        from_secret: GITHUB_PAT
+      password: { from_secret: GITHUB_PAT }
       context: pacientes
       dockerfile: pacientes/Dockerfile
       tags:
         - latest
         - ${COMMIT_SHA}
 
-  - name: build-and-push-inventario
+  build_inventario:
     image: woodpeckerci/plugin-docker-buildx
     settings:
       registry: ghcr.io
       repo: ghcr.io/criz8766/proyecto_gps_servidor/inventario
       username: criz8766
-      password:
-        from_secret: GITHUB_PAT
+      password: { from_secret: GITHUB_PAT }
       context: inventario
       dockerfile: inventario/Dockerfile
       tags:
         - latest
         - ${COMMIT_SHA}
 
-  - name: build-and-push-frontend
+  # --- ESTE ES EL PASO CORREGIDO ---
+  build_frontend:
     image: woodpeckerci/plugin-docker-buildx
     settings:
       registry: ghcr.io
       repo: ghcr.io/criz8766/proyecto_gps_servidor/frontend
       username: criz8766
-      password:
-        from_secret: GITHUB_PAT
+      password: { from_secret: GITHUB_PAT }
       context: frontend
       dockerfile: frontend/Dockerfile
-      build_args:
-        - REACT_APP_AUTH0_DOMAIN=${REACT_APP_AUTH0_DOMAIN}
-        - REACT_APP_AUTH0_CLIENT_ID=${REACT_APP_AUTH0_CLIENT_ID}
-        - REACT_APP_AUTH0_API_AUDIENCE=${REACT_APP_AUTH0_API_AUDIENCE}
-      tags:
-        - latest
-    # AÑADIMOS LA FORMA CORRECTA DE USAR SECRETOS
-    environment:
-      REACT_APP_AUTH0_DOMAIN:
-        from_secret: REACT_APP_AUTH0_DOMAIN
-      REACT_APP_AUTH0_CLIENT_ID:
-        from_secret: REACT_APP_AUTH0_CLIENT_ID
-      REACT_APP_AUTH0_API_AUDIENCE:
-        from_secret: REACT_APP_AUTH0_API_AUDIENCE
+      tags: [ latest ]
+      # Esta es la forma correcta de inyectar los secretos como build-args
+      build_args_from_env:
+        - REACT_APP_AUTH0_DOMAIN
+        - REACT_APP_AUTH0_CLIENT_ID
+        - REACT_APP_AUTH0_API_AUDIENCE
