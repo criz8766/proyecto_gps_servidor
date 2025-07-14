@@ -29,7 +29,8 @@ docker compose pull
 # 'up -d' actualiza los contenedores en segundo plano.
 # '--remove-orphans' limpia contenedores de servicios que ya no existen.
 echo "Reiniciando los servicios con las nuevas imágenes..."
-docker compose up -d --force-recreate --remove-orphans
+docker compose down
+docker compose up --build -d
 
 # 6. Opcional: Limpia imágenes de Docker que ya no están en uso
 echo "Limpiando imágenes antiguas sin usar..."
