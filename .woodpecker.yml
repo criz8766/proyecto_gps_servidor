@@ -1,51 +1,59 @@
-# .woodpecker.yml (Versión Final con Inyección de Secretos)
+# .woodpecker.yml (Versión Final con Sintaxis Corregida)
 
 when:
   branch: main
   event: push
 
 steps:
-  build_pacientes:
+  - name: build-and-push-pacientes
     image: woodpeckerci/plugin-docker-buildx
     settings:
       registry: ghcr.io
       repo: ghcr.io/criz8766/proyecto_gps_servidor/pacientes
       username: criz8766
-      password: { from_secret: GITHUB_PAT }
+      password:
+        from_secret: GITHUB_PAT
       context: pacientes
       dockerfile: pacientes/Dockerfile
-      tags: [ latest ]
+      tags:
+        - latest
+        - ${COMMIT_SHA}
 
-  build_inventario:
+  - name: build-and-push-inventario
     image: woodpeckerci/plugin-docker-buildx
     settings:
       registry: ghcr.io
       repo: ghcr.io/criz8766/proyecto_gps_servidor/inventario
       username: criz8766
-      password: { from_secret: GITHUB_PAT }
+      password:
+        from_secret: GITHUB_PAT
       context: inventario
       dockerfile: inventario/Dockerfile
-      tags: [ latest ]
+      tags:
+        - latest
+        - ${COMMIT_SHA}
 
-  # --- ESTE ES EL PASO CORREGIDO ---
-  build_frontend:
+  - name: build-and-push-frontend
     image: woodpeckerci/plugin-docker-buildx
-    # 1. Le decimos al paso que necesita acceso a estos secretos
-    secrets:
-      - GITHUB_PAT
-      - REACT_APP_AUTH0_DOMAIN
-      - REACT_APP_AUTH0_CLIENT_ID
-      - REACT_APP_AUTH0_API_AUDIENCE
     settings:
       registry: ghcr.io
       repo: ghcr.io/criz8766/proyecto_gps_servidor/frontend
       username: criz8766
-      password: { from_secret: GITHUB_PAT }
+      password:
+        from_secret: GITHUB_PAT
       context: frontend
       dockerfile: frontend/Dockerfile
-      # 2. Inyectamos los secretos como argumentos de construcción
       build_args:
         - REACT_APP_AUTH0_DOMAIN=${REACT_APP_AUTH0_DOMAIN}
         - REACT_APP_AUTH0_CLIENT_ID=${REACT_APP_AUTH0_CLIENT_ID}
         - REACT_APP_AUTH0_API_AUDIENCE=${REACT_APP_AUTH0_API_AUDIENCE}
-      tags: [ latest ]
+      tags:
+        - latest
+    # AÑADIMOS LA FORMA CORRECTA DE USAR SECRETOS
+    environment:
+      REACT_APP_AUTH0_DOMAIN:
+        from_secret: REACT_APP_AUTH0_DOMAIN
+      REACT_APP_AUTH0_CLIENT_ID:
+        from_secret: REACT_APP_AUTH0_CLIENT_ID
+      REACT_APP_AUTH0_API_AUDIENCE:
+        from_secret: REACT_APP_AUTH0_API_AUDIENCE
