@@ -1,24 +1,10 @@
+# .woodpecker.yml (Versión CI Final, Corregida y Funcional)
+
 when:
   branch: main
   event: push
 
 steps:
-- name: debug-env
-  image: alpine
-  environment:
-    REACT_APP_AUTH0_DOMAIN:
-      from_secret: REACT_APP_AUTH0_DOMAIN
-    REACT_APP_AUTH0_CLIENT_ID:
-      from_secret: REACT_APP_AUTH0_CLIENT_ID
-    REACT_APP_AUTH0_API_AUDIENCE:
-      from_secret: REACT_APP_AUTH0_API_AUDIENCE
-  commands:
-    - |
-      echo "=== Variables de entorno React ==="
-      echo "Auth0 Domain: $REACT_APP_AUTH0_DOMAIN"
-      echo "Client ID: $REACT_APP_AUTH0_CLIENT_ID"
-      echo "Audience: $REACT_APP_AUTH0_API_AUDIENCE"
-
 - name: build-pacientes
   image: woodpeckerci/plugin-docker-buildx
   settings:
@@ -47,35 +33,34 @@ steps:
       - latest
       - ${COMMIT_SHA}
 
-- name: crear-env-frontend
-  image: alpine
+# --- ESTE ES EL PASO CORREGIDO ---
+- name: build-frontend
+  image: woodpeckerci/plugin-docker-buildx
+  # 1. Cargamos los secretos necesarios en el entorno de este paso
   environment:
+    GITHUB_PAT:
+      from_secret: GITHUB_PAT
     REACT_APP_AUTH0_DOMAIN:
       from_secret: REACT_APP_AUTH0_DOMAIN
     REACT_APP_AUTH0_CLIENT_ID:
       from_secret: REACT_APP_AUTH0_CLIENT_ID
     REACT_APP_AUTH0_API_AUDIENCE:
       from_secret: REACT_APP_AUTH0_API_AUDIENCE
-  commands:
-    - |
-      echo "REACT_APP_AUTH0_DOMAIN=$REACT_APP_AUTH0_DOMAIN" > frontend/.env
-      echo "REACT_APP_AUTH0_CLIENT_ID=$REACT_APP_AUTH0_CLIENT_ID" >> frontend/.env
-      echo "REACT_APP_AUTH0_API_AUDIENCE=$REACT_APP_AUTH0_API_AUDIENCE" >> frontend/.env
-
-- name: build-frontend
-  image: woodpeckerci/plugin-docker-buildx
   settings:
     registry: ghcr.io
     repo: ghcr.io/criz8766/proyecto_gps_servidor/frontend
     username: criz8766
-    password:
-      from_secret: GITHUB_PAT
+    password: ${GITHUB_PAT} # Usamos la variable cargada del entorno
     context: frontend
     dockerfile: frontend/Dockerfile
     tags:
       - latest
       - ${COMMIT_SHA}
-    build_args_from_env:
-      - REACT_APP_AUTH0_DOMAIN
-      - REACT_APP_AUTH0_CLIENT_ID
-      - REACT_APP_AUTH0_API_AUDIENCE
+    # 2. Le decimos a Docker que use las variables del entorno del paso
+    #    y añadimos las que son fijas, igual que en tu docker-compose local.
+    build_args:
+      - REACT_APP_AUTH0_DOMAIN=${REACT_APP_AUTH0_DOMAIN}
+      - REACT_APP_AUTH0_CLIENT_ID=${REACT_APP_AUTH0_CLIENT_ID}
+      - REACT_APP_AUTH0_API_AUDIENCE=${REACT_APP_AUTH0_API_AUDIENCE}
+      - REACT_APP_PACIENTES_API_URL=/api/pacientes
+      - REACT_APP_INVENTARIO_API_URL=/api/inventario
