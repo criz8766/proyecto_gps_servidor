@@ -31,13 +31,8 @@ steps:
         - latest
         - ${COMMIT_SHA}
 
-  # --- ESTE ES EL PASO CORREGIDO ---
   build_frontend:
     image: woodpeckerci/plugin-docker-buildx
-    environment:
-      REACT_APP_AUTH0_DOMAIN: ${REACT_APP_AUTH0_DOMAIN}
-      REACT_APP_AUTH0_CLIENT_ID: ${REACT_APP_AUTH0_CLIENT_ID}
-      REACT_APP_AUTH0_API_AUDIENCE: ${REACT_APP_AUTH0_API_AUDIENCE}
     settings:
       registry: ghcr.io
       repo: ghcr.io/criz8766/proyecto_gps_servidor/frontend
@@ -46,7 +41,6 @@ steps:
       context: frontend
       dockerfile: frontend/Dockerfile
       tags: [ latest ]
-      # Esta es la forma correcta de inyectar los secretos como build-args
       build_args_from_env:
         - REACT_APP_AUTH0_DOMAIN
         - REACT_APP_AUTH0_CLIENT_ID
