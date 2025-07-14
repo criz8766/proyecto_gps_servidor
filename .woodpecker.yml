@@ -1,10 +1,30 @@
-# .woodpecker.yml – Configuración completa para pacientes, inventario y frontend con build args
-
 when:
   branch: main
   event: push
 
 steps:
+- name: debug-env
+  image: alpine
+  environment:
+    REACT_APP_AUTH0_DOMAIN:
+      from_secret: REACT_APP_AUTH0_DOMAIN
+    REACT_APP_AUTH0_CLIENT_ID:
+      from_secret: REACT_APP_AUTH0_CLIENT_ID
+    REACT_APP_AUTH0_API_AUDIENCE:
+      from_secret: REACT_APP_AUTH0_API_AUDIENCE
+    REACT_APP_PACIENTES_API_URL:
+      from_secret: REACT_APP_PACIENTES_API_URL
+    REACT_APP_INVENTARIO_API_URL:
+      from_secret: REACT_APP_INVENTARIO_API_URL
+  commands:
+    - |
+      echo "=== Variables de entorno React ==="
+      echo "Auth0 Domain: $REACT_APP_AUTH0_DOMAIN"
+      echo "Client ID: $REACT_APP_AUTH0_CLIENT_ID"
+      echo "Audience: $REACT_APP_AUTH0_API_AUDIENCE"
+      echo "Pacientes API URL: $REACT_APP_PACIENTES_API_URL"
+      echo "Inventario API URL: $REACT_APP_INVENTARIO_API_URL"
+
 - name: build-pacientes
   image: woodpeckerci/plugin-docker-buildx
   settings:
@@ -33,15 +53,6 @@ steps:
       - latest
       - ${COMMIT_SHA}
 
-- name: debug-env
-  image: alpine
-  commands:
-    - echo "Auth0 Domain: $REACT_APP_AUTH0_DOMAIN"
-    - echo "Client ID: $REACT_APP_AUTH0_CLIENT_ID"
-    - echo "Audience: $REACT_APP_AUTH0_API_AUDIENCE"
-    - echo "Pacientes API URL: $REACT_APP_PACIENTES_API_URL"
-    - echo "Inventario API URL: $REACT_APP_INVENTARIO_API_URL"
-
 - name: build-frontend
   image: woodpeckerci/plugin-docker-buildx
   settings:
@@ -61,9 +72,3 @@ steps:
       - REACT_APP_AUTH0_API_AUDIENCE
       - REACT_APP_PACIENTES_API_URL
       - REACT_APP_INVENTARIO_API_URL
-  environment:
-    REACT_APP_AUTH0_DOMAIN: from_secret:REACT_APP_AUTH0_DOMAIN
-    REACT_APP_AUTH0_CLIENT_ID: from_secret:REACT_APP_AUTH0_CLIENT_ID
-    REACT_APP_AUTH0_API_AUDIENCE: from_secret:REACT_APP_AUTH0_API_AUDIENCE
-    REACT_APP_PACIENTES_API_URL: from_secret:REACT_APP_PACIENTES_API_URL
-    REACT_APP_INVENTARIO_API_URL: from_secret:REACT_APP_INVENTARIO_API_URL
