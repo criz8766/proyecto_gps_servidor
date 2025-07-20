@@ -159,7 +159,7 @@ services:
     ports:
       - "8004:8000" # Exponemos el servicio en el puerto 8004
     volumes:
-      - ./informes/app # Sincronizamos el archivo app.py
+      - ./informes:/app # Sincronizamos el archivo app.py
     restart: always
     depends_on:
       - postgres

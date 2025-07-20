@@ -4,7 +4,8 @@ from app.models import Paciente, PacienteCreate
 from app.database import get_connection
 from app.kafka_producer import enviar_evento
 from app.security import validate_token # Importación para la protección de Auth0
-
+from datetime import datetime, timedelta # Asegúrate de importar esto
+from pydantic import BaseModel # Asegúrate de importar esto
 router = APIRouter()
 
 @router.post("/", response_model=Paciente, status_code=201)
@@ -203,3 +204,69 @@ def eliminar_paciente(id_paciente: int, current_user_payload: dict = Depends(val
             cur.close()
         if conn:
             conn.close()
+
+class DispensacionCreate(BaseModel):
+    producto_id: int
+    nombre_producto: str
+    cantidad: int
+
+@router.post("/{paciente_id}/dispensaciones", status_code=201, summary="Registrar entrega de medicamento a un paciente")
+def registrar_dispensacion_a_paciente(
+    paciente_id: int,
+    dispensacion: DispensacionCreate,
+    current_user_payload: dict = Depends(validate_token) # Usando tu validador
+):
+    conn = get_connection()
+    cur = conn.cursor()
+    try:
+        # Verificar que el paciente existe
+        cur.execute("SELECT id FROM pacientes WHERE id = %s", (paciente_id,))
+        if cur.fetchone() is None:
+            raise HTTPException(status_code=404, detail="Paciente no encontrado.")
+
+        # Insertar la nueva dispensación
+        cur.execute(
+            """
+            INSERT INTO dispensaciones (paciente_id, producto_id, nombre_producto, cantidad)
+            VALUES (%s, %s, %s, %s) RETURNING id;
+            """,
+            (paciente_id, dispensacion.producto_id, dispensacion.nombre_producto, dispensacion.cantidad)
+        )
+        id_nueva_dispensacion = cur.fetchone()[0]
+        conn.commit()
+        return {"id": id_nueva_dispensacion, **dispensacion.dict()}
+    finally:
+        cur.close()
+        conn.close()
+
+@router.get("/{paciente_id}/alertas", summary="Verificar si un paciente ha retirado un medicamento recientemente")
+def verificar_alertas_medicamento(
+    paciente_id: int,
+    producto_id: int,
+    dias: int = 30,
+    current_user_payload: dict = Depends(validate_token) # Usando tu validador
+):
+    conn = get_connection()
+    cur = conn.cursor()
+    try:
+        fecha_limite = datetime.utcnow() - timedelta(days=dias)
+        cur.execute(
+            """
+            SELECT id, fecha_dispensacion FROM dispensaciones
+            WHERE paciente_id = %s AND producto_id = %s AND fecha_dispensacion >= %s;
+            """,
+            (paciente_id, producto_id, fecha_limite)
+        )
+        retiros_recientes = cur.fetchall()
+        
+        if retiros_recientes:
+            return {
+                "alerta": True,
+                "mensaje": f"Alerta: El paciente ya ha retirado este medicamento {len(retiros_recientes)} vez/veces en los últimos {dias} días.",
+                "retiros": [{"id_dispensacion": r[0], "fecha": r[1]} for r in retiros_recientes]
+            }
+        
+        return {"alerta": False, "mensaje": "No se encontraron retiros recientes para este medicamento."}
+    finally:
+        cur.close()
+        conn.close()

@@ -9,6 +9,7 @@ import { BrowserRouter as Router, Routes, Route, NavLink, Navigate } from 'react
 // 2. Se importan las nuevas "Páginas" que contendrán los componentes
 import PaginaPacientes from './components/PaginaPacientes';
 import PaginaInventario from './components/PaginaInventario';
+import PaginaInformes from './components/PaginaInformes';
 
 function App() {
   const { 
@@ -53,6 +54,7 @@ function App() {
                   <nav className="main-nav">
                     <NavLink to="/pacientes">Pacientes</NavLink>
                     <NavLink to="/inventario">Inventario</NavLink>
+                    <NavLink to="/informes">Informes</NavLink>
                   </nav>
 
                   {/* Botón de Cerrar Sesión */}
@@ -80,6 +82,7 @@ function App() {
             <Routes>
               <Route path="/pacientes" element={<PaginaPacientes />} />
               <Route path="/inventario" element={<PaginaInventario />} />
+              <Route path="/informes" element={<PaginaInformes />} />
               
               {/* Ruta por defecto: si el usuario va a la raíz, se redirige a /pacientes */}
               <Route path="*" element={<Navigate to="/pacientes" />} />
