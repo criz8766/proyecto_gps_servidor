@@ -12,6 +12,19 @@ export interface PacienteCreate { // También usado para datos de actualización
   fecha_nacimiento: string;
 }
 
+export interface Dispensacion {
+  id: number;
+  paciente_id: number;
+  producto_id: number; // Asumimos que guardas el ID del producto
+  cantidad: number;
+  fecha_dispensacion: string;
+}
+
+export interface DispensacionCreate {
+  producto_id: number;
+  cantidad: number;
+}
+
 const BASE_URL = process.env.REACT_APP_PACIENTES_API_URL || "http://localhost:8000/api/pacientes";
 
 // Función genérica para manejar las llamadas fetch con token y errores
@@ -71,4 +84,28 @@ export async function obtenerPacientePorIdAPI(id: number, token: string): Promis
 
 export async function obtenerPacientePorRutAPI(rut: string, token: string): Promise<Paciente> {
   return fetchAPI<Paciente>(`${BASE_URL}/rut/${rut}`, token);
+}
+
+/**
+ * Obtiene el historial de dispensaciones de un paciente específico.
+ */
+export async function obtenerDispensacionesAPI(pacienteId: number, token: string): Promise<Dispensacion[]> {
+  return fetchAPI<Dispensacion[]>(`${BASE_URL}/${pacienteId}/dispensaciones`, token);
+}
+
+/**
+ * Registra una nueva dispensación de medicamento para un paciente.
+ */
+export async function registrarDispensacionAPI(pacienteId: number, dispensacionData: DispensacionCreate, token: string): Promise<Dispensacion> {
+  return fetchAPI<Dispensacion>(`${BASE_URL}/${pacienteId}/dispensaciones`, token, {
+    method: 'POST',
+    body: JSON.stringify(dispensacionData),
+  });
+}
+
+/**
+ * Verifica si existe una alerta para un medicamento y paciente específicos.
+ */
+export async function verificarAlertaAPI(pacienteId: number, productoId: number, token: string): Promise<{ alerta: boolean; mensaje: string }> {
+    return fetchAPI<{ alerta: boolean; mensaje: string }>(`${BASE_URL}/${pacienteId}/dispensaciones/alerta?producto_id=${productoId}`, token);
 }

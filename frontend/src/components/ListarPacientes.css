@@ -131,3 +131,5 @@
 .cerrar-modal:hover {
   color: #333;
 }
+
+.btn-accion.info { background-color: #17a2b8; }
