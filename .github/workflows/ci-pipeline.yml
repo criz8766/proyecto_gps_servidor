@@ -44,13 +44,15 @@ jobs:
           push: true
           tags: ghcr.io/criz8766/proyecto_gps_servidor/inventario:latest
 
-      - name: Construir y subir imagen de usuarios
+      -
+
+       name: Construir y subir imagen de transacciones
         uses: docker/build-push-action@v5
         with:
-          context: ./usuarios
-          file: ./usuarios/Dockerfile
+          context: ./transacciones
+          file: ./transacciones/Dockerfile
           push: true
-          tags: ghcr.io/criz8766/proyecto_gps_servidor/usuarios:latest
+          tags: ghcr.io/criz8766/proyecto_gps_servidor/transacciones:latest
 
       - name: Construir y subir imagen de frontend
         uses: docker/build-push-action@v5
