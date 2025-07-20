@@ -127,7 +127,25 @@ services:
     depends_on:
       - postgres # Es buena práctica añadir la dependencia a la base de datos
 
-
+  transacciones:
+    container_name: transacciones
+    build:
+      context: ./transacciones
+    environment:
+      # Usamos las mismas variables que los otros servicios
+      AUTH0_DOMAIN: ${AUTH0_DOMAIN}
+      AUTH0_API_AUDIENCE: ${AUTH0_API_AUDIENCE}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - "8003:8000"  # Puerto 8003 de tu máquina, 8000 del contenedor
+    volumes:
+      - ./transacciones:/app
+    restart: always
+    depends_on:
+      - postgres      # Depende de la base de datos
+      - usuarios      # Puede que necesite consultar roles de usuario
+      - inventario    # Necesitará interactuar con el stock
 
 
 volumes:
