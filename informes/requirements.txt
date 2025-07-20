@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+gunicorn
+python-dotenv
+SQLAlchemy
+psycopg2-binary
+python-jose[cryptography]
+requests
+httpx
+
+# --- Librerías para generar informes en Excel ---
+pandas
+openpyxl

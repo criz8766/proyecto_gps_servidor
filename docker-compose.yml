@@ -147,6 +147,22 @@ services:
       - usuarios      # Puede que necesite consultar roles de usuario
       - inventario    # Necesitará interactuar con el stock
 
+  informes:
+    container_name: informes
+    build:
+      context: ./informes
+    environment:
+      # Le pasamos las mismas variables que a los otros servicios
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      AUTH0_DOMAIN: ${AUTH0_DOMAIN}
+      AUTH0_API_AUDIENCE: ${AUTH0_API_AUDIENCE}
+    ports:
+      - "8004:8000" # Exponemos el servicio en el puerto 8004
+    volumes:
+      - ./informes/app # Sincronizamos el archivo app.py
+    restart: always
+    depends_on:
+      - postgres
 
 volumes:
   pgdata:
