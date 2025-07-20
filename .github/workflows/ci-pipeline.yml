@@ -44,9 +44,7 @@ jobs:
           push: true
           tags: ghcr.io/criz8766/proyecto_gps_servidor/inventario:latest
 
-      -
-
-       name: Construir y subir imagen de transacciones
+      - name: Construir y subir imagen de transacciones
         uses: docker/build-push-action@v5
         with:
           context: ./transacciones
