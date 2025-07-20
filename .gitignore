@@ -27,3 +27,5 @@ nginx/nginx.conf
 deploy.sh
 # Ignorar el script de inicio de todos los servicios
 start_all.sh
+# Ignorar todas las carpetas cache de python
+**/__pycache__/
