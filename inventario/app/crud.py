@@ -50,3 +50,24 @@ def recibir_compra(db: Session, compra_id: int):
     db.commit()
     db.refresh(db_orden)
     return db_orden
+
+# --- AÑADE ESTA FUNCIÓN PARA ACTUALIZAR ---
+def update_producto(db: Session, producto_id: int, producto: schemas.ProductoCreate):
+    db_producto = db.query(models.Producto).filter(models.Producto.id == producto_id).first()
+    if db_producto:
+        # Actualiza los campos del producto existente con los nuevos datos
+        update_data = producto.model_dump(exclude_unset=True)
+        for key, value in update_data.items():
+            setattr(db_producto, key, value)
+        db.commit()
+        db.refresh(db_producto)
+    return db_producto
+
+# --- AÑADE ESTA FUNCIÓN PARA ELIMINAR ---
+def delete_producto(db: Session, producto_id: int):
+    db_producto = db.query(models.Producto).filter(models.Producto.id == producto_id).first()
+    if db_producto:
+        db.delete(db_producto)
+        db.commit()
+    return db_producto
+

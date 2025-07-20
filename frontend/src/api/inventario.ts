@@ -18,9 +18,10 @@ export interface ProductoCreate {
     stock: number;
 }
 
-// Función para listar todos los productos
-export const listarProductosAPI = async (): Promise<Producto[]> => {
-    const response = await fetch(`${API_URL}/`); // Usar solo API_URL + '/'
+export const listarProductosAPI = async (token: string): Promise<Producto[]> => {
+    const response = await fetch(`${API_URL}/`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
     if (!response.ok) {
         throw new Error("Error al obtener la lista de productos");
     }
@@ -45,4 +46,33 @@ export const crearProductoAPI = async (producto: ProductoCreate, token: string):
     return response.json();
 };
 
-// Aquí podrías añadir funciones para actualizar y eliminar productos en el futuro
+// --- NUEVA FUNCIÓN PARA ACTUALIZAR ---
+export const actualizarProductoAPI = async (id: number, productoData: ProductoCreate, token: string): Promise<Producto> => {
+    const response = await fetch(`${API_URL}/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(productoData)
+    });
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Error al actualizar el producto");
+    }
+    return response.json();
+};
+
+// --- NUEVA FUNCIÓN PARA ELIMINAR ---
+export const eliminarProductoAPI = async (id: number, token: string): Promise<void> => {
+    const response = await fetch(`${API_URL}/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || "Error al eliminar el producto");
+    }
+};

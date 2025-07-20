@@ -1,9 +1,10 @@
 // frontend/src/pages/PaginaInventario.tsx
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import { listarProductosAPI, crearProductoAPI, Producto, ProductoCreate } from '../api/inventario';
-import FormularioProducto from './FormularioProducto'; // Lo crearemos ahora
-import ListarProductos from './ListarProductos';   // Lo crearemos ahora
+import { listarProductosAPI, Producto } from '../api/inventario';
+import FormularioProducto from '../components/FormularioProducto';
+import ListarProductos from '../components/ListarProductos';
 
 const PaginaInventario: React.FC = () => {
     const { getAccessTokenSilently, isAuthenticated } = useAuth0();
@@ -15,31 +16,31 @@ const PaginaInventario: React.FC = () => {
         if (!isAuthenticated) return;
         setCargando(true);
         try {
-            const data = await listarProductosAPI();
+            const token = await getAccessTokenSilently(); // Necesitamos el token aquí
+            const data = await listarProductosAPI(token);
             setProductos(data);
-        } catch (error) {
-            setMensaje('Error al cargar productos.');
+        } catch (error: any) {
+            setMensaje(error.message || 'Error al cargar productos.');
         } finally {
             setCargando(false);
         }
-    }, [isAuthenticated]);
+    }, [isAuthenticated, getAccessTokenSilently]);
 
     useEffect(() => {
         cargarProductos();
     }, [cargarProductos]);
 
-    const handleProductoCreado = () => {
-        // Refresca la lista de productos después de crear uno nuevo
-        cargarProductos();
-    };
-
     return (
         <div className="dashboard-container">
             <div className="card component-card">
-                <FormularioProducto onProductoCreado={handleProductoCreado} />
+                <FormularioProducto onProductoCreado={cargarProductos} />
             </div>
             <div className="card component-card">
-                <ListarProductos productos={productos} cargando={cargando} />
+                <ListarProductos 
+                    productos={productos} 
+                    cargando={cargando} 
+                    onAccionRealizada={cargarProductos} // Pasamos la función para refrescar
+                />
             </div>
         </div>
     );
