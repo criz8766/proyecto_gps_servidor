@@ -104,6 +104,31 @@ services:
       - pacientes
       - inventario
 
+  usuarios:
+    container_name: usuarios
+    build:
+      context: ./usuarios
+    # --- ESTA ES LA SECCIÓN MODIFICADA ---
+    # Usamos 'environment' para ser consistentes con los otros servicios.
+    # Docker Compose reemplazará estas variables con los valores del archivo .env
+    environment:
+      AUTH0_DOMAIN: ${AUTH0_DOMAIN}
+      AUTH0_API_AUDIENCE: ${AUTH0_API_AUDIENCE} # Asegúrate que el nombre de la variable coincida con el .env
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: postgres
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    ports:
+      - "8002:8000"
+    volumes:
+      - ./usuarios:/app
+    restart: always
+    depends_on:
+      - postgres # Es buena práctica añadir la dependencia a la base de datos
+
+
+
 
 volumes:
   pgdata:
