@@ -12,6 +12,7 @@ import PaginaVentas from './components/PaginaVentas';
 import PaginaUsuarios from './components/PaginaUsuarios';
 import { obtenerMiPerfilUsuarioAPI } from './api/usuarios';
 
+import PaginaDashboard from './components/PaginaDashboard';
 function App() {
   const {
     loginWithRedirect,
@@ -82,6 +83,7 @@ function App() {
               {isAuthenticated ? (
                 <>
                   <nav className="main-nav">
+                    <NavLink to="/dashboard">Dashboard</NavLink>
                     <NavLink to="/pacientes">Pacientes</NavLink>
                     <NavLink to="/inventario">Inventario</NavLink>
                     <NavLink to="/informes">Informes</NavLink>
@@ -112,6 +114,9 @@ function App() {
         <main className="main-content">
           {isAuthenticated ? (
             <Routes>
+
+              <Route path="/" element={<PaginaDashboard />} /> 
+              <Route path="/dashboard" element={<PaginaDashboard />} /> {/* NUEVO: Ruta explícita para Dashboard */}
               <Route path="/pacientes" element={<PaginaPacientes />} />
               <Route path="/inventario" element={<PaginaInventario />} />
               <Route path="/informes" element={<PaginaInformes />} />
@@ -126,7 +131,7 @@ function App() {
               )}
               
               {/* Ruta por defecto: si el usuario va a la raíz, se redirige a /pacientes */}
-              <Route path="*" element={<Navigate to="/pacientes" />} />
+              <Route path="*" element={<Navigate to="/dashboard" />} />
             </Routes>
           ) : (
             <div className="welcome-container">

@@ -1,0 +1,53 @@
+/* frontend/src/components/DashboardContent.css */
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.dashboard-card {
+    text-align: center;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 150px; /* Asegura un tamaño mínimo para las tarjetas */
+}
+
+.dashboard-card h3 {
+    color: var(--primary-color);
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+}
+
+.metric-number {
+    font-size: 3em;
+    font-weight: bold;
+    color: var(--text-color);
+    line-height: 1;
+}
+
+.dashboard-loading,
+.dashboard-error {
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.2rem;
+    color: #6c757d;
+}
+
+.dashboard-error {
+    color: #dc3545;
+}
+
+/* Ajustes para la clase .dashboard-container en App.css si es necesario */
+/* Asegúrate de que .dashboard-container en App.css no interfiera con el layout de grid aquí */
+/* Puedes comentar o remover la definición de grid-template-columns en App.css para .dashboard-container
+   si este DashboardContent.css toma el control del layout principal del dashboard.
+   O asegúrate de usar clases diferentes. Para esta implementación, asumimos
+   que este .dashboard-grid será el contenedor principal del dashboard. */
