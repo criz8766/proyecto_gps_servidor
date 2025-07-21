@@ -45,9 +45,36 @@
     color: #dc3545;
 }
 
-/* Ajustes para la clase .dashboard-container en App.css si es necesario */
-/* Asegúrate de que .dashboard-container en App.css no interfiera con el layout de grid aquí */
-/* Puedes comentar o remover la definición de grid-template-columns en App.css para .dashboard-container
-   si este DashboardContent.css toma el control del layout principal del dashboard.
-   O asegúrate de usar clases diferentes. Para esta implementación, asumimos
-   que este .dashboard-grid será el contenedor principal del dashboard. */
+/* Estilos para tarjetas de acento */
+.dashboard-card.accent-low-stock {
+    background-color: #fff3cd; /* Amarillo claro */
+    border-color: #ffeeba;
+    color: #856404;
+}
+
+.dashboard-card.accent-users {
+    background-color: #d4edda; /* Verde claro */
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.dashboard-card .sub-text {
+    font-size: 0.9em;
+    color: #6c757d;
+    margin-top: 5px;
+}
+
+.dashboard-card .role-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 1em;
+}
+
+.dashboard-card .role-list li {
+    margin-bottom: 5px;
+}
+
+.dashboard-card .role-list li:last-child {
+    margin-bottom: 0;
+}
