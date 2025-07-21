@@ -71,7 +71,7 @@ const FormularioProducto: React.FC<Props> = ({ onProductoCreado, productoAEditar
             <form onSubmit={handleSubmit}>
                 {/* --- SECCIÓN JSX QUE FALTABA --- */}
                 <div className="form-group">
-                    <label htmlFor="nombre">Nombre del Producto</label>
+                    <label htmlFor="nombre">Nombre del Producto.</label>
                     <input type="text" id="nombre" name="nombre" value={formData.nombre} onChange={handleChange} required />
                 </div>
                 <div className="form-group">
