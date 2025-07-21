@@ -2,6 +2,7 @@ import React from 'react';
 import './App.css';
 import { useAuth0 } from '@auth0/auth0-react';
 import { FiLogIn, FiLogOut, FiUser, FiLoader } from 'react-icons/fi';
+import PaginaVentas from './components/PaginaVentas'; // Añade esta línea
 
 // 1. Se importan las herramientas de React Router
 import { BrowserRouter as Router, Routes, Route, NavLink, Navigate } from 'react-router-dom';
@@ -55,6 +56,7 @@ function App() {
                     <NavLink to="/pacientes">Pacientes</NavLink>
                     <NavLink to="/inventario">Inventario</NavLink>
                     <NavLink to="/informes">Informes</NavLink>
+                    <NavLink to="/ventas">Ventas</NavLink>
                   </nav>
 
                   {/* Botón de Cerrar Sesión */}
@@ -83,6 +85,7 @@ function App() {
               <Route path="/pacientes" element={<PaginaPacientes />} />
               <Route path="/inventario" element={<PaginaInventario />} />
               <Route path="/informes" element={<PaginaInformes />} />
+              <Route path="/ventas" element={<PaginaVentas />} />
               
               {/* Ruta por defecto: si el usuario va a la raíz, se redirige a /pacientes */}
               <Route path="*" element={<Navigate to="/pacientes" />} />

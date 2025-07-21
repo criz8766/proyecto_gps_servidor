@@ -1,0 +1,87 @@
+/* frontend/src/components/RegistrarVenta.css */
+
+.registrar-venta-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto; /* Centra el contenedor */
+    padding: 20px;
+}
+
+.section-title {
+    text-align: center;
+    color: var(--primary-color);
+    margin-bottom: 2rem;
+}
+
+.form-inline-search {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1rem;
+    align-items: flex-end; /* Alinea los elementos al final */
+}
+
+.form-inline-search .form-control {
+    flex-grow: 1; /* Permite que el input ocupe el espacio disponible */
+    min-width: 180px; /* Asegura un ancho mínimo */
+}
+
+.paciente-info {
+    background-color: #e2f0fb; /* Un azul claro */
+    border: 1px solid #b3d9f7; /* Un borde azul más oscuro */
+    border-radius: var(--border-radius);
+    padding: 10px 15px;
+    margin-top: 15px;
+    font-size: 0.95rem;
+    color: #0056b3; /* Texto azul oscuro */
+    text-align: left;
+}
+
+/* Reutiliza form-group de FormularioPaciente.css si es necesario */
+.registrar-venta-container .form-group {
+    margin-bottom: 1.25rem;
+    text-align: left;
+}
+
+.registrar-venta-container .form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #555;
+}
+
+.registrar-venta-container .form-group input[type="text"],
+.registrar-venta-container .form-group input[type="number"],
+.registrar-venta-container .form-group select {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.registrar-venta-container .form-group input:focus,
+.registrar-venta-container .form-group select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+/* Asegúrate de que los botones reutilicen los estilos generales de btn */
+.registrar-venta-container .btn {
+    margin-top: 1rem;
+}
+
+
+/* Adaptación para pantallas pequeñas */
+@media (max-width: 768px) {
+    .form-inline-search {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .form-inline-search .form-control,
+    .form-inline-search button {
+        width: 100%;
+    }
+}
