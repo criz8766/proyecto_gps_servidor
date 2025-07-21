@@ -69,3 +69,7 @@ export async function eliminarUsuarioAPI(id: string, token: string): Promise<voi
 export async function obtenerUsuarioPorIdAPI(id: string, token: string): Promise<Usuario> {
   return fetchAPI<Usuario>(`${API_URL}/${id}`, token);
 }
+
+export async function obtenerMiPerfilUsuarioAPI(token: string): Promise<Usuario> {
+    return fetchAPI<Usuario>(`${API_URL}/perfil`, token);
+}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './App.css';
 import { useAuth0 } from '@auth0/auth0-react';
 import { FiLogIn, FiLogOut, FiUser, FiLoader } from 'react-icons/fi';
@@ -12,14 +12,39 @@ import PaginaInformes from './components/PaginaInformes';
 import PaginaVentas from './components/PaginaVentas';
 import PaginaUsuarios from './components/PaginaUsuarios'; // Añade esta línea
 
+import { obtenerUsuarioPorIdAPI, Usuario } from './api/usuarios';
+import { obtenerMiPerfilUsuarioAPI } from './api/usuarios';
+
 function App() {
   const { 
     loginWithRedirect, 
     logout, 
     user, 
     isAuthenticated, 
-    isLoading 
+    isLoading,
+    getAccessTokenSilently
   } = useAuth0();
+
+  useEffect(() => {
+    const syncUserWithBackend = async () => {
+      if (isAuthenticated && user) {
+        try {
+          const token = await getAccessTokenSilently({
+            authorizationParams: { audience: process.env.REACT_APP_AUTH0_API_AUDIENCE! },
+          });
+          // Llama al endpoint /perfil para que se cree/obtenga el usuario en la DB del backend
+          const backendUser = await obtenerMiPerfilUsuarioAPI(token);
+          console.log('Usuario sincronizado con backend:', backendUser);
+          // Opcional: podrías guardar el rol del backend en un estado local si necesitas usarlo en el frontend
+        } catch (error) {
+          console.error('Error al sincronizar usuario con el backend:', error);
+          // Aquí puedes manejar errores, por ejemplo, mostrar un mensaje al usuario
+        }
+      }
+    };
+
+    syncUserWithBackend();
+  }, [isAuthenticated, user, getAccessTokenSilently]); // Dependencias del efecto
 
   if (isLoading) {
     return (
