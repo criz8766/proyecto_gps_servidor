@@ -1,91 +1,97 @@
-import React, { useEffect } from 'react';
+// frontend/src/App.tsx
+
+import React, { useEffect, useState } from 'react'; // Asegúrate de importar useState
 import './App.css';
 import { useAuth0 } from '@auth0/auth0-react';
 import { FiLogIn, FiLogOut, FiUser, FiLoader } from 'react-icons/fi';
-// 1. Se importan las herramientas de React Router
 import { BrowserRouter as Router, Routes, Route, NavLink, Navigate } from 'react-router-dom';
-
-// 2. Se importan las nuevas "Páginas" que contendrán los componentes
 import PaginaPacientes from './components/PaginaPacientes';
 import PaginaInventario from './components/PaginaInventario';
 import PaginaInformes from './components/PaginaInformes';
 import PaginaVentas from './components/PaginaVentas';
-import PaginaUsuarios from './components/PaginaUsuarios'; // Añade esta línea
-
-import { obtenerUsuarioPorIdAPI, Usuario } from './api/usuarios';
+import PaginaUsuarios from './components/PaginaUsuarios';
 import { obtenerMiPerfilUsuarioAPI } from './api/usuarios';
 
 function App() {
-  const { 
-    loginWithRedirect, 
-    logout, 
-    user, 
-    isAuthenticated, 
+  const {
+    loginWithRedirect,
+    logout,
+    user,
+    isAuthenticated,
     isLoading,
     getAccessTokenSilently
   } = useAuth0();
 
+  // NUEVO: Estado para guardar el rol del usuario desde el backend
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [isRoleLoading, setIsRoleLoading] = useState(true); // Para saber si el rol ya cargó
+
+  // Sincronizar el usuario con la base de datos del backend y obtener su rol
   useEffect(() => {
-    const syncUserWithBackend = async () => {
+    const syncUserAndGetRole = async () => {
       if (isAuthenticated && user) {
         try {
           const token = await getAccessTokenSilently({
             authorizationParams: { audience: process.env.REACT_APP_AUTH0_API_AUDIENCE! },
           });
-          // Llama al endpoint /perfil para que se cree/obtenga el usuario en la DB del backend
           const backendUser = await obtenerMiPerfilUsuarioAPI(token);
           console.log('Usuario sincronizado con backend:', backendUser);
-          // Opcional: podrías guardar el rol del backend en un estado local si necesitas usarlo en el frontend
+          setUserRole(backendUser.rol); // Guarda el rol del backend
         } catch (error) {
-          console.error('Error al sincronizar usuario con el backend:', error);
-          // Aquí puedes manejar errores, por ejemplo, mostrar un mensaje al usuario
+          console.error('Error al sincronizar usuario o obtener rol del backend:', error);
+          setUserRole(null); // Resetea el rol en caso de error
+        } finally {
+          setIsRoleLoading(false); // La carga del rol ha terminado
         }
+      } else if (!isAuthenticated) {
+        setUserRole(null); // Resetea el rol si no está autenticado
+        setIsRoleLoading(false); // La carga del rol ha terminado (no hay usuario para cargar)
       }
     };
 
-    syncUserWithBackend();
-  }, [isAuthenticated, user, getAccessTokenSilently]); // Dependencias del efecto
+    syncUserAndGetRole();
+  }, [isAuthenticated, user, getAccessTokenSilently]);
 
-  if (isLoading) {
+  if (isLoading || isRoleLoading) { // Añade isRoleLoading a la condición de carga
     return (
       <div className="loading-container">
         {FiLoader({ className: "loading-spinner" })}
-        <p>Cargando aplicación...</p>
+        <p>Cargando aplicación y perfil de usuario...</p>
       </div>
     );
   }
 
+  // Define si el usuario actual es administrador
+  const isAdmin = userRole === 'admin_general';
+
   return (
-    // 3. Se envuelve toda la aplicación en el Router
     <Router>
       <div className="App">
         <header className="App-header">
           <div className="header-content">
-            
-            {/* --- GRUPO IZQUIERDO: Título y Saludo --- */}
             <div className="header-left">
               <h1 className="logo-title">Gestión Farmacia</h1>
               {isAuthenticated && user && (
                 <span className="user-greeting">
-                  {FiUser({})} Hola, {user.name || user.email}
+                  {FiUser({})} Hola, {user.name || user.email} ({userRole}) {/* Muestra el rol */}
                 </span>
               )}
             </div>
 
-            {/* --- GRUPO DERECHO: Navegación y Sesión --- */}
             <div className="header-right">
               {isAuthenticated ? (
                 <>
-                  {/* Menú de Navegación con NavLink para estilos activos */}
                   <nav className="main-nav">
                     <NavLink to="/pacientes">Pacientes</NavLink>
                     <NavLink to="/inventario">Inventario</NavLink>
                     <NavLink to="/informes">Informes</NavLink>
                     <NavLink to="/ventas">Ventas</NavLink>
-                    <NavLink to="/usuarios">Usuarios</NavLink>
+                    {/* NUEVO: Mostrar el enlace a Usuarios solo si es admin */}
+                    {isAdmin && (
+                      <NavLink to="/usuarios">Usuarios</NavLink>
+                    )}
                   </nav>
 
-                  {/* Botón de Cerrar Sesión */}
                   <button
                     className="btn btn-secondary"
                     onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}
@@ -95,7 +101,6 @@ function App() {
                   </button>
                 </>
               ) : (
-                 // Botón de Iniciar Sesión cuando no se está autenticado
                 <button className="btn btn-primary" onClick={() => loginWithRedirect()}>
                   {FiLogIn({})} <span>Iniciar Sesión</span>
                 </button>
@@ -106,13 +111,19 @@ function App() {
 
         <main className="main-content">
           {isAuthenticated ? (
-            // 4. Aquí se decide qué página mostrar según la URL
             <Routes>
               <Route path="/pacientes" element={<PaginaPacientes />} />
               <Route path="/inventario" element={<PaginaInventario />} />
               <Route path="/informes" element={<PaginaInformes />} />
               <Route path="/ventas" element={<PaginaVentas />} />
-               <Route path="/usuarios" element={<PaginaUsuarios />} />
+
+              {/* NUEVO: Proteger la ruta de Usuarios */}
+              {isAdmin ? (
+                <Route path="/usuarios" element={<PaginaUsuarios />} />
+              ) : (
+                // Redirigir a pacientes si no es admin e intenta acceder a /usuarios
+                <Route path="/usuarios" element={<Navigate to="/pacientes" />} />
+              )}
               
               {/* Ruta por defecto: si el usuario va a la raíz, se redirige a /pacientes */}
               <Route path="*" element={<Navigate to="/pacientes" />} />
