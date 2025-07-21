@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { listarPacientesAPI, Paciente } from '../api/pacientes';
 import { listarProductosAPI, Producto } from '../api/inventario';
-import { listarUsuariosAPI, Usuario } from '../api/usuarios'; // NUEVO: Importa listarUsuariosAPI y Usuario
+import { listarUsuariosAPI, Usuario } from '../api/usuarios';
 import './Pagina.css';
 import './DashboardContent.css';
 
@@ -12,51 +12,75 @@ const DashboardContent: React.FC = () => {
     const { getAccessTokenSilently, isAuthenticated } = useAuth0();
     const [totalPacientes, setTotalPacientes] = useState<number | null>(null);
     const [totalProductos, setTotalProductos] = useState<number | null>(null);
-    const [lowStockProductsCount, setLowStockProductsCount] = useState<number | null>(null); // NUEVO
-    const [usersByRole, setUsersByRole] = useState<Record<string, number> | null>(null); // NUEVO
+    const [lowStockProductsCount, setLowStockProductsCount] = useState<number | null>(null);
+    const [usersByRole, setUsersByRole] = useState<Record<string, number> | null>(null);
     const [isLoadingData, setIsLoadingData] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
     const fetchData = useCallback(async () => {
         if (!isAuthenticated) {
+            // Este mensaje es para usuarios NO autenticados.
             setError('Debes iniciar sesión para ver los datos del Dashboard.');
             setIsLoadingData(false);
             return;
         }
 
         setIsLoadingData(true);
-        setError(null);
+        setError(null); // Limpiar errores previos
 
         try {
             const token = await getAccessTokenSilently({
                 authorizationParams: { audience: process.env.REACT_APP_AUTH0_API_AUDIENCE! },
             });
 
-            // Obtener total de pacientes
-            const pacientes: Paciente[] = await listarPacientesAPI(token);
-            setTotalPacientes(pacientes.length);
+            // --- Cargar datos de Pacientes (accesible para todos los roles autenticados) ---
+            try {
+                const pacientes: Paciente[] = await listarPacientesAPI(token);
+                setTotalPacientes(pacientes.length);
+            } catch (err: any) {
+                console.error('Error al cargar pacientes para el Dashboard:', err);
+                setTotalPacientes(null); // Opcional: mostrar N/A si falla
+                // No establecemos el error principal aquí para no bloquear todo el dashboard
+            }
 
-            // Obtener total de productos y contar los de bajo stock
-            const products: Producto[] = await listarProductosAPI(token);
-            setTotalProductos(products.length);
-            const LOW_STOCK_THRESHOLD = 10; // Puedes ajustar este umbral
-            const lowStockCount = products.filter(p => p.stock <= LOW_STOCK_THRESHOLD).length;
-            setLowStockProductsCount(lowStockCount);
+            // --- Cargar datos de Productos (accesible para todos los roles autenticados) ---
+            try {
+                const products: Producto[] = await listarProductosAPI(token);
+                setTotalProductos(products.length);
+                const LOW_STOCK_THRESHOLD = 10;
+                const lowStockCount = products.filter(p => p.stock <= LOW_STOCK_THRESHOLD).length;
+                setLowStockProductsCount(lowStockCount);
+            } catch (err: any) {
+                console.error('Error al cargar productos para el Dashboard:', err);
+                setTotalProductos(null); // Opcional: mostrar N/A si falla
+                setLowStockProductsCount(null);
+                // No establecemos el error principal aquí
+            }
 
-            // Obtener usuarios y agrupar por rol
-            const users: Usuario[] = await listarUsuariosAPI(token);
-            const rolesCount: Record<string, number> = {};
-            users.forEach(user => {
-                rolesCount[user.rol] = (rolesCount[user.rol] || 0) + 1;
-            });
-            setUsersByRole(rolesCount);
+            // --- Cargar datos de Usuarios (probablemente solo para administradores) ---
+            try {
+                const users: Usuario[] = await listarUsuariosAPI(token);
+                const rolesCount: Record<string, number> = {};
+                users.forEach(user => {
+                    rolesCount[user.rol] = (rolesCount[user.rol] || 0) + 1;
+                });
+                setUsersByRole(rolesCount);
+            } catch (userApiError: any) {
+                // Si falla la API de usuarios (ej. por permisos), no mostramos un error general,
+                // simplemente indicamos que esa sección no está disponible.
+                console.warn('No se pudieron cargar los datos de usuarios (posiblemente por permisos):', userApiError.message);
+                setUsersByRole(null); // Reiniciar para indicar que no hay datos
+            }
 
         } catch (err: any) {
-            console.error('Error fetching dashboard data:', err);
-            setError(err.message || 'Error al cargar los datos del Dashboard.');
+            // Este catch solo se activará si falla la obtención del token o alguna API crítica
+            // que no esté envuelta en su propio try-catch.
+            console.error('Error crítico al obtener datos del Dashboard:', err);
+            setError(err.message || 'Error desconocido al cargar el Dashboard.');
+            // En este caso, sí reseteamos todo porque es un fallo más grave.
             setTotalPacientes(null);
             setTotalProductos(null);
-            setLowStockProductsCount(null); // Resetea también los nuevos estados
+            setLowStockProductsCount(null);
             setUsersByRole(null);
         } finally {
             setIsLoadingData(false);
@@ -71,6 +95,7 @@ const DashboardContent: React.FC = () => {
         return <div className="dashboard-loading"><p>Cargando datos del dashboard...</p></div>;
     }
 
+    // Si hay un error crítico (ej. no se pudo obtener el token), mostramos el error.
     if (error) {
         return <div className="dashboard-error"><p>{error}</p></div>;
     }
@@ -105,10 +130,9 @@ const DashboardContent: React.FC = () => {
                         ))}
                     </ul>
                 ) : (
-                    <p>N/A</p>
+                    <p className="sub-text">Datos no disponibles (requiere permisos de administrador).</p>
                 )}
             </div>
-            {/* Puedes añadir más tarjetas para otras métricas aquí */}
         </div>
     );
 };
