@@ -12,6 +12,8 @@ import PaginaVentas from './components/PaginaVentas';
 import PaginaUsuarios from './components/PaginaUsuarios';
 import { obtenerMiPerfilUsuarioAPI } from './api/usuarios';
 
+import PaginaCompras from './components/PaginaCompras';
+import PaginaCaja from './components/PaginaCaja';
 import PaginaConsultaPrecio from './components/PaginaConsultaPrecio';
 import PaginaDashboard from './components/PaginaDashboard';
 function App() {
@@ -90,6 +92,7 @@ function App() {
                     <NavLink to="/informes">Informes</NavLink>
                     <NavLink to="/ventas">Ventas</NavLink>
                     <NavLink to="/consulta-precio">Consulta Precio</NavLink>
+                    <NavLink to="/caja">Caja</NavLink>
                     {/* NUEVO: Mostrar el enlace a Usuarios solo si es admin */}
                     {isAdmin && (
                       <NavLink to="/usuarios">Usuarios</NavLink>
@@ -124,12 +127,14 @@ function App() {
               <Route path="/informes" element={<PaginaInformes />} />
               <Route path="/ventas" element={<PaginaVentas />} />
               <Route path="/consulta-precio" element={<PaginaConsultaPrecio />} />
+              <Route path="/caja" element={<PaginaCaja />} />
+              
               {/* NUEVO: Proteger la ruta de Usuarios */}
               {isAdmin ? (
                 <Route path="/usuarios" element={<PaginaUsuarios />} />
               ) : (
                 // Redirigir a pacientes si no es admin e intenta acceder a /usuarios
-                <Route path="/usuarios" element={<Navigate to="/pacientes" />} />
+                <Route path="/usuarios" element={<Navigate to="/dashboard" />} />
               )}
               
               {/* Ruta por defecto: si el usuario va a la raíz, se redirige a /pacientes */}

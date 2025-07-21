@@ -1,0 +1,140 @@
+/* frontend/src/components/PuntoDeVenta.css */
+
+.punto-de-venta-container {
+    padding: 20px;
+    max-width: 1400px; /* Un poco más amplio para el POS */
+    margin: 0 auto;
+}
+
+.pos-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* Por defecto, una columna */
+    gap: 2rem;
+}
+
+@media (min-width: 992px) { /* A partir de pantallas grandes, dos columnas */
+    .pos-grid {
+        grid-template-columns: 2fr 1fr; /* Panel izquierdo más ancho que el derecho */
+    }
+}
+
+.pos-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* Reutilizamos card, card-body, card-title de Pagina.css o index.css */
+
+.product-list-scroll {
+    max-height: 400px; /* Altura máxima para la lista de productos */
+    overflow-y: auto; /* Scroll si hay muchos productos */
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 10px;
+    background-color: #f8f9fa; /* Un fondo ligeramente diferente */
+}
+
+.product-selection-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.product-selection-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px dashed #eee;
+}
+
+.product-selection-list li:last-child {
+    border-bottom: none;
+}
+
+.btn-add-to-cart {
+    padding: 5px 10px;
+    font-size: 0.85rem;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 5px;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.btn-add-to-cart:hover:not(:disabled) {
+    background-color: var(--primary-hover-color);
+}
+
+.btn-add-to-cart:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+
+.cart-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.cart-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.cart-list li:last-child {
+    border-bottom: none;
+}
+
+.cart-item-qty {
+    width: 60px;
+    padding: 5px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+}
+
+.btn-remove-item {
+    background: none;
+    border: none;
+    color: var(--secondary-color);
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: auto; /* Empuja el botón a la derecha */
+}
+
+.btn-remove-item:hover {
+    text-decoration: underline;
+}
+
+.cart-total {
+    margin-top: 15px;
+    font-size: 1.2em;
+    text-align: right;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-color);
+}
+
+.paciente-info-venta {
+    background-color: #e9ecef;
+    border: 1px solid #dee2e6;
+    border-radius: var(--border-radius);
+    padding: 10px 15px;
+    margin-top: 15px;
+    font-size: 0.95rem;
+    color: #333;
+    text-align: left;
+}
+
+.final-venta-card .resumen-venta p {
+    margin-bottom: 5px;
+}
+
+.final-venta-card .resumen-venta strong {
+    font-size: 1.5em;
+    color: var(--primary-color);
+}

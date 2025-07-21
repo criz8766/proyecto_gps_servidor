@@ -1,0 +1,62 @@
+/* frontend/src/components/FormularioOrdenCompra.css */
+
+.detalle-orden-item {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    align-items: flex-end; /* Alinea los elementos en la parte inferior */
+    border: 1px solid #e0e0e0;
+    border-radius: var(--border-radius);
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: #fcfcfc;
+    position: relative; /* Para posicionar el botón de eliminar */
+}
+
+.detalle-orden-item .form-group {
+    margin-bottom: 0; /* Elimina el margen inferior del form-group dentro del detalle */
+}
+
+.detalle-orden-item .form-control {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.btn-remove-item {
+    background: none;
+    border: none;
+    color: var(--secondary-color);
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1.5rem;
+    position: absolute; /* Posicionamiento absoluto */
+    top: 5px;
+    right: 10px;
+    transition: color 0.2s ease-in-out;
+}
+
+.btn-remove-item:hover {
+    color: var(--secondary-hover-color);
+}
+
+.add-detalle-btn {
+    width: auto; /* Ajusta el ancho al contenido */
+    margin-top: 10px;
+    margin-bottom: 20px;
+    padding: 8px 15px;
+    font-size: 0.9rem;
+}
+
+/* Ajustes para pantallas pequeñas */
+@media (max-width: 768px) {
+    .detalle-orden-item {
+        grid-template-columns: 1fr; /* Apila los elementos en una sola columna */
+        padding-top: 30px; /* Espacio para el botón de eliminar */
+    }
+    .btn-remove-item {
+        top: 5px;
+        right: 5px;
+    }
+}

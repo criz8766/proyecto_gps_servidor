@@ -1,0 +1,21 @@
+/* frontend/src/components/ListarOrdenesCompra.css */
+
+.estado-badge {
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: white;
+}
+
+.estado-badge.pendiente {
+    background-color: #ffc107; /* Amarillo */
+}
+
+.estado-badge.recibida {
+    background-color: #28a745; /* Verde */
+}
+
+/* Reutiliza .listar-pacientes-container, .listar-pacientes-title, .mensaje-feedback,
+   .tabla-responsive-container, .pacientes-table, .acciones-cell, .btn-accion,
+   .btn-accion.info, .btn-accion.editar, .btn-accion.eliminar de ListarPacientes.css */
