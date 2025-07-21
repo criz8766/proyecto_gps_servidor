@@ -2,18 +2,20 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import { listarUsuariosAPI, eliminarUsuarioAPI, actualizarUsuarioAPI, Usuario, UsuarioCreate } from '../api/usuarios';
+// Asegúrate de que las interfaces y funciones se importen correctamente
+import { listarUsuariosAPI, eliminarUsuarioAPI, actualizarUsuarioAPI, Usuario, UsuarioCreate } from '../api/usuarios'; 
 import FormularioUsuario from './FormularioUsuario';
-import './ListarPacientes.css'; // Reutilizamos los estilos de tabla y botones de acción
+import './ListarPacientes.css'; 
 
 interface ListarUsuariosProps {
-  onUsuarioModificado: () => void; // Callback para refrescar la lista
+  onUsuarioModificado: () => void; 
 }
 
 const ListarUsuarios: React.FC<ListarUsuariosProps> = ({ onUsuarioModificado }) => {
   const { getAccessTokenSilently, isAuthenticated, isLoading: isLoadingAuth } = useAuth0();
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [mensaje, setMensaje] = useState('');
+  
   const [cargandoLista, setCargandoLista] = useState(false);
 
   const [usuarioAEditar, setUsuarioAEditar] = useState<Usuario | null>(null);
@@ -51,7 +53,8 @@ const ListarUsuarios: React.FC<ListarUsuariosProps> = ({ onUsuarioModificado }) 
     }
   }, [isAuthenticated, cargarUsuarios]);
 
-  const handleEliminar = async (id: number, nombre: string) => {
+  // CAMBIO: ID es de tipo 'string'
+  const handleEliminar = async (id: string, nombre: string) => {
     if (!isAuthenticated) {
       setMensaje('Debe iniciar sesión para realizar esta acción.');
       return;
@@ -59,12 +62,13 @@ const ListarUsuarios: React.FC<ListarUsuariosProps> = ({ onUsuarioModificado }) 
     if (window.confirm(`¿Estás seguro de que deseas eliminar al usuario "${nombre}"?`)) {
       setMensaje('Eliminando usuario...');
       try {
+        console.log("Intentando eliminar usuario con ID:", id); // Aquí se depuró el 'undefined'
         const token = await getAccessTokenSilently({
           authorizationParams: { audience: process.env.REACT_APP_AUTH0_API_AUDIENCE! },
         });
-        await eliminarUsuarioAPI(id, token);
+        await eliminarUsuarioAPI(id, token); // Pasa 'id' (que ahora es string)
         setMensaje(`Usuario "${nombre}" eliminado exitosamente.`);
-        onUsuarioModificado(); // Notificar al padre para recargar la lista
+        onUsuarioModificado(); 
       } catch (error: any) {
         console.error(error);
         setMensaje(error.message || 'Error desconocido al eliminar usuario');
@@ -75,7 +79,7 @@ const ListarUsuarios: React.FC<ListarUsuariosProps> = ({ onUsuarioModificado }) 
   const handleEditar = (usuario: Usuario) => {
     setUsuarioAEditar(usuario);
     setMostrarModalEdicion(true);
-    setMensajeEdicion('');
+    setMensajeEdicion(''); 
   };
 
   const handleCerrarModalEdicion = () => {
@@ -85,16 +89,20 @@ const ListarUsuarios: React.FC<ListarUsuariosProps> = ({ onUsuarioModificado }) 
   };
 
   const handleSubmitEdicion = async (formData: UsuarioCreate) => {
-    if (!usuarioAEditar || !isAuthenticated) return;
+    if (!usuarioAEditar || !isAuthenticated) {
+        setMensajeEdicion("Error: No se ha seleccionado un usuario para editar o no está autenticado.");
+        return;
+    }
 
     setIsSubmittingEdicion(true);
     setMensajeEdicion('Actualizando usuario...');
     try {
+      // CAMBIO: Usa usuarioAEditar.user_id
+      console.log("Intentando actualizar usuario con ID:", usuarioAEditar.user_id, "Datos:", formData);
       const token = await getAccessTokenSilently({
         authorizationParams: { audience: process.env.REACT_APP_AUTH0_API_AUDIENCE! },
       });
 
-      // Solo enviar la contraseña si ha sido modificada (no está vacía)
       const dataToSend: Partial<UsuarioCreate> = {
           email: formData.email,
           nombre: formData.nombre,
@@ -104,10 +112,10 @@ const ListarUsuarios: React.FC<ListarUsuariosProps> = ({ onUsuarioModificado }) 
           dataToSend.password = formData.password;
       }
 
-      await actualizarUsuarioAPI(usuarioAEditar.id, dataToSend, token);
+      await actualizarUsuarioAPI(usuarioAEditar.user_id, dataToSend, token); // Pasa usuarioAEditar.user_id
       setMensajeEdicion(`Usuario "${formData.nombre}" actualizado exitosamente.`);
       handleCerrarModalEdicion();
-      onUsuarioModificado(); // Recargar la lista
+      onUsuarioModificado();
     } catch (error: any) {
       console.error(error);
       setMensajeEdicion(error.message || 'Error desconocido al actualizar usuario');
@@ -121,7 +129,7 @@ const ListarUsuarios: React.FC<ListarUsuariosProps> = ({ onUsuarioModificado }) 
   }
 
   return (
-    <div className="listar-pacientes-container"> {/* Reutiliza el contenedor general */}
+    <div className="listar-pacientes-container">
       <h2 className="listar-pacientes-title">Lista de Usuarios</h2>
       
       {isAuthenticated && mensaje && !mostrarModalEdicion && (
@@ -136,10 +144,10 @@ const ListarUsuarios: React.FC<ListarUsuariosProps> = ({ onUsuarioModificado }) 
         <p className="listar-pacientes-mensaje">No hay usuarios registrados.</p>
       ) : (
         <div className="tabla-responsive-container">
-          <table className="pacientes-table"> {/* Reutiliza la tabla de pacientes */}
+          <table className="pacientes-table">
             <thead>
               <tr>
-                <th>ID</th>
+                <th>ID Usuario</th> {/* CAMBIO: Etiqueta de la columna */}
                 <th>Nombre</th>
                 <th>Email</th>
                 <th>Rol</th>
@@ -148,14 +156,14 @@ const ListarUsuarios: React.FC<ListarUsuariosProps> = ({ onUsuarioModificado }) 
             </thead>
             <tbody>
               {usuarios.map((usuario) => (
-                <tr key={usuario.id}>
-                  <td data-label="ID">{usuario.id}</td>
+                <tr key={usuario.user_id}> {/* CAMBIO: usa user_id como key */}
+                  <td data-label="ID Usuario">{usuario.user_id}</td> {/* CAMBIO: muestra user_id */}
                   <td data-label="Nombre">{usuario.nombre}</td>
                   <td data-label="Email">{usuario.email}</td>
                   <td data-label="Rol">{usuario.rol}</td>
                   <td data-label="Acciones" className="acciones-cell">
                     <button className="btn-accion editar" onClick={() => handleEditar(usuario)}>Editar</button>
-                    <button className="btn-accion eliminar" onClick={() => handleEliminar(usuario.id, usuario.nombre)}>Eliminar</button>
+                    <button className="btn-accion eliminar" onClick={() => handleEliminar(usuario.user_id, usuario.nombre)}>Eliminar</button> {/* CAMBIO: pasa user_id */}
                   </td>
                 </tr>
               ))}
@@ -164,7 +172,6 @@ const ListarUsuarios: React.FC<ListarUsuariosProps> = ({ onUsuarioModificado }) 
         </div>
       )}
 
-      {/* Modal de Edición */}
       {mostrarModalEdicion && usuarioAEditar && (
         <div className="modal-edicion">
           <div className="modal-contenido">

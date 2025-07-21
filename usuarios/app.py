@@ -197,3 +197,28 @@ async def update_user_rol(
     db.refresh(db_user)
     
     return {"user_id": db_user.id, "rol": db_user.rol.value}
+
+# --- NUEVO ENDPOINT: Eliminar Usuario (AÑADE ESTE BLOQUE) ---
+@app.delete("/api/usuarios/{user_id_to_delete}", status_code=204) # Responde con 204 No Content al éxito
+async def delete_user(
+    user_id_to_delete: str, # El user_id que viene en la URL
+    db: Session = Depends(get_db),
+    admin_payload: dict = Depends(admin_required) # Protege la ruta para que solo administradores eliminen
+):
+    """
+    Elimina un usuario por su user_id.
+    Solo accesible para usuarios con el rol 'admin_general'.
+    Retorna 204 No Content si la eliminación es exitosa.
+    """
+    db_user = db.query(Usuario).filter(Usuario.id == user_id_to_delete).first()
+
+    if not db_user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado.")
+
+    # Opcional: Lógica para evitar que un administrador se elimine a sí mismo.
+    # if user_id_to_delete == admin_payload.get("sub"):
+    #     raise HTTPException(status_code=403, detail="No puedes eliminar tu propia cuenta de administrador.")
+    
+    db.delete(db_user)
+    db.commit()
+    return # FastAPI automáticamente devolverá 204 No Content
