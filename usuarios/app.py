@@ -9,6 +9,7 @@ import enum
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request, Depends, HTTPException, Body
 from jose import jwt
+from fastapi.middleware.cors import CORSMiddleware
 
 # --- LIBRERÍAS PARA LA BASE DE DATOS (MODERNAS) ---
 from sqlalchemy import create_engine, Column, String, Enum as SQLAlchemyEnum
@@ -59,6 +60,25 @@ Base.metadata.create_all(bind=engine)
 
 # Iniciar la aplicación FastAPI
 app = FastAPI()
+
+origins = [
+    "http://localhost",
+    "http://localhost:3000",
+    "https://sga.arccidev.com",
+    "http://sga.arccidev.com",
+    # Origen de tu frontend React en desarrollo
+    # Puedes añadir otros orígenes específicos de tu frontend en producción aquí
+    # por ejemplo: "https://tudominio.com"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],  # Permite todos los métodos (GET, POST, PUT, DELETE, etc.)
+    allow_headers=["*"],  # Permite todas las cabeceras (incluida Authorization)
+)
+
 
 # --- LÓGICA DE VALIDACIÓN DE TOKEN (Sin cambios) ---
 async def get_token_payload(request: Request):

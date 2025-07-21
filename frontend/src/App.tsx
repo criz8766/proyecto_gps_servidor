@@ -2,8 +2,6 @@ import React from 'react';
 import './App.css';
 import { useAuth0 } from '@auth0/auth0-react';
 import { FiLogIn, FiLogOut, FiUser, FiLoader } from 'react-icons/fi';
-import PaginaVentas from './components/PaginaVentas'; // Añade esta línea
-
 // 1. Se importan las herramientas de React Router
 import { BrowserRouter as Router, Routes, Route, NavLink, Navigate } from 'react-router-dom';
 
@@ -11,6 +9,8 @@ import { BrowserRouter as Router, Routes, Route, NavLink, Navigate } from 'react
 import PaginaPacientes from './components/PaginaPacientes';
 import PaginaInventario from './components/PaginaInventario';
 import PaginaInformes from './components/PaginaInformes';
+import PaginaVentas from './components/PaginaVentas';
+import PaginaUsuarios from './components/PaginaUsuarios'; // Añade esta línea
 
 function App() {
   const { 
@@ -57,6 +57,7 @@ function App() {
                     <NavLink to="/inventario">Inventario</NavLink>
                     <NavLink to="/informes">Informes</NavLink>
                     <NavLink to="/ventas">Ventas</NavLink>
+                    <NavLink to="/usuarios">Usuarios</NavLink>
                   </nav>
 
                   {/* Botón de Cerrar Sesión */}
@@ -86,6 +87,7 @@ function App() {
               <Route path="/inventario" element={<PaginaInventario />} />
               <Route path="/informes" element={<PaginaInformes />} />
               <Route path="/ventas" element={<PaginaVentas />} />
+               <Route path="/usuarios" element={<PaginaUsuarios />} />
               
               {/* Ruta por defecto: si el usuario va a la raíz, se redirige a /pacientes */}
               <Route path="*" element={<Navigate to="/pacientes" />} />
