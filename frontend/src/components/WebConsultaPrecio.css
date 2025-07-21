@@ -1,0 +1,45 @@
+/* frontend/src/components/WebConsultaPrecio.css */
+
+.consulta-precio-container {
+    width: 100%;
+    max-width: 900px; /* Un poco más amplio para la tabla */
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.consulta-precio-container .form-inline-search {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+    align-items: flex-end;
+}
+
+.consulta-precio-container .form-inline-search input {
+    flex-grow: 1;
+    min-width: 200px;
+}
+
+.search-results-section {
+    margin-top: 2rem;
+}
+
+/* Reutiliza estilos de tabla de ListarPacientes.css y mensajes de feedback */
+/* Asegúrate de que las clases .mensaje-feedback, .tabla-responsive-container, .pacientes-table
+   ya estén definidas en tus CSS globales o importadas. */
+
+/* Ajuste para el input de búsqueda */
+.consulta-precio-container input[type="text"].form-control {
+    width: 100%; /* Asegura que el input ocupe el ancho completo disponible en su contenedor */
+}
+
+/* Para pantallas más pequeñas, apilar la barra de búsqueda */
+@media (max-width: 768px) {
+    .consulta-precio-container .form-inline-search {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .consulta-precio-container .form-inline-search input,
+    .consulta-precio-container .form-inline-search button {
+        width: 100%;
+    }
+}

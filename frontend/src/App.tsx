@@ -12,6 +12,7 @@ import PaginaVentas from './components/PaginaVentas';
 import PaginaUsuarios from './components/PaginaUsuarios';
 import { obtenerMiPerfilUsuarioAPI } from './api/usuarios';
 
+import PaginaConsultaPrecio from './components/PaginaConsultaPrecio';
 import PaginaDashboard from './components/PaginaDashboard';
 function App() {
   const {
@@ -88,6 +89,7 @@ function App() {
                     <NavLink to="/inventario">Inventario</NavLink>
                     <NavLink to="/informes">Informes</NavLink>
                     <NavLink to="/ventas">Ventas</NavLink>
+                    <NavLink to="/consulta-precio">Consulta Precio</NavLink>
                     {/* NUEVO: Mostrar el enlace a Usuarios solo si es admin */}
                     {isAdmin && (
                       <NavLink to="/usuarios">Usuarios</NavLink>
@@ -121,7 +123,7 @@ function App() {
               <Route path="/inventario" element={<PaginaInventario />} />
               <Route path="/informes" element={<PaginaInformes />} />
               <Route path="/ventas" element={<PaginaVentas />} />
-
+              <Route path="/consulta-precio" element={<PaginaConsultaPrecio />} />
               {/* NUEVO: Proteger la ruta de Usuarios */}
               {isAdmin ? (
                 <Route path="/usuarios" element={<PaginaUsuarios />} />
